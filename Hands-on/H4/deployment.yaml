@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replics according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:       # this template is simply  the configuration of pod ecculing the first two lines ie apiversion and kind
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.17.3
+      tolerations:
+      - key: "key1"
+        operator: "Equal"
+        value: "value1"
+        effect: "NoSchedule"
