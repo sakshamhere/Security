@@ -65,7 +65,7 @@ White box perspective
 - find out how this framework defend CSRF
 - review code to ensure the defences are not disabled, sometime developers does them which leads to attack vector
 - review all sensitive functionality to ensure CSRF defence has been applied
-
+ 
 
 
 
