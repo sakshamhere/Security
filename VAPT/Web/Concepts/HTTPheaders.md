@@ -36,8 +36,10 @@
 - Cookie                    - The Cookie HTTP request header contains stored HTTP cookies associated with the server 
                               (i.e. previously sent by the server with the Set-Cookie header or set in JavaScript using Document.cookie).
 
-- Referer                   - The Referer HTTP request header contains an absolute or partial address of the page that makes the 
-                              request.This header may have undesirable consequences for user security and privacy.
+- Referer                   - The Referer HTTP request header contains an absolute or partial address of the page that makes 
+                              the request.This header may have undesirable consequences for user security and privacy.
+
+                              The Referer header can contain an origin, path, and querystring, and may not contain URL fragments (i.e. #section) or username:password information. The request's referrer policy defines the data that can be included.
 
 - Referrer-Policy           - The Referrer-Policy HTTP header controls how much referrer information (sent with the Referer header) 
                               should be included with requests. Aside from the HTTP header, you can set this policy in HTML.

@@ -52,12 +52,28 @@
                           This has many fairly innocent uses, including analytics, logging, or optimized caching. 
                           However, there are more problematic uses such as tracking or stealing information, or even just side effects such as inadvertently leaking sensitive information.
 
+                          The Referer header can contain an origin, path, and querystring, and may not contain URL fragments (i.e. #section) or username:password information. The request's referrer policy defines the data that can be included.
+
                           The Referrer-Policy header on your server to control what information is sent through the Referer header. 
 
-    no-referrer - The Referer header will be omitted: sent requests do not include any referrer information.
-    origin - Send only the origin in the Referer header. For example, a document at https://example.com/page.html will send the     
-             referrer https://example.com/.
-    same-origin - Send the origin, path, and query string for same-origin requests. Don't send the Referer header for cross-origin requests.
+    no-referrer -       The Referer header will be omitted: sent requests do not include any referrer information.
+    origin -            Send only the origin in the Referer header. For example, a document at https://example.com/page.html 
+                        will send the referrer https://example.com/.
+
+    same-origin -       Send the origin, path, and query string for same-origin requests. Don't send the Referer header for 
+                        cross-origin requests.
+
+Referrer-Policy: no-referrer
+Referrer-Policy: no-referrer-when-downgrade
+Referrer-Policy: origin
+Referrer-Policy: origin-when-cross-origin
+Referrer-Policy: same-origin
+Referrer-Policy: strict-origin
+Referrer-Policy: strict-origin-when-cross-origin
+Referrer-Policy: unsafe-url
+
+
+HTTP Refrere Leak explained - https://www.youtube.com/watch?v=uDigwNal7GQ 
 
 # Other Defences
 
@@ -67,3 +83,4 @@
                         The HTTP TRACE method is designed for diagnostic purposes. If enabled, the web server will respond to requests that use the TRACE method by echoing in its response the exact request that was received.
 
                         This behavior is often harmless, but occasionally leads to the disclosure of sensitive information such as internal authentication headers appended by reverse proxies. This functionality could historically be used to bypass the HttpOnly cookie flag on cookies, but this is no longer possible in modern web browsers.
+

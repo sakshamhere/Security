@@ -40,7 +40,7 @@ Instead the attacker will create a malicious website that interest victim, while
 
 * No unpredictable request parameters - there should be no unpredictable paramenters like CSRF token
 
-* Existence of HTML tags whose presence cause immediate access to an HTTP[S] resource; for example the image tag img.
+> Even if CSRF token is there we can find vulnerability in many ways if the CSRF validation is not done correctly
 
 # Impact of CSRF
 

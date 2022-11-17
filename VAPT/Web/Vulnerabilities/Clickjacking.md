@@ -3,6 +3,8 @@ Clickjacking is an interface-based attack in which a user is tricked into clicki
 
 Historically, clickjacking has been used to perform behaviors such as boosting "likes" on a Facebook page. 
 
+Clickjacking is part of “Insecure Design” ranked #4 in the “OWASP Top-10 Vulnerabilities“
+
 # Example
 A web user accesses a decoy website (perhaps this is a link provided by an email) and clicks on a button to win a prize. Unknowingly, they have been deceived by an attacker into pressing an alternative hidden button and this results in the payment of an account on another site
 

@@ -61,3 +61,15 @@ Responses are grouped in five classes:
             ie Trace method allows clinet to see what is being recieved at server, or instructs the server to reflect recieved message back to the client
 
 - OPTIONS   The HTTP OPTIONS method requests permitted communication METHODS AVAILIBLE for a given URL or server.
+
+# Some methods
+
+- History.pushState()   - In an HTML document, the history.pushState() method adds an entry to the browser's session history 
+                          stack.
+
+    Syntax
+                pushState(state, unused)
+                pushState(state, unused, url)
+
+    https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
+
