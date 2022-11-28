@@ -24,3 +24,7 @@ https://tcsglobal.udemy.com/course/metasploit-framework-penetration-testing-with
 5. Sqlmap
 6. Nessus
 7. Metasploit
+
+> kali linux
+- Nikto - Nikto, a web vulnerability scanner in Kali Linux.
+- Metasploit - Metasploit Project is a computer security project that provides information about security vulnerabilities and aids in penetration testing and IDS signature development.
