@@ -47,6 +47,11 @@
 - X-Forwarded-For           - The X-Forwarded-For (XFF) request header is a de-facto standard header for identifying the originating IP
                               address of a client connecting to a web server through a proxy server.Improper use of this header can be a security risk, This header, by design, exposes privacy-sensitive information, such as the IP address of the client. Therefore the user's privacy must be kept in mind when deploying this header.
 
+- X-Forwarded-Host          - The X-Forwarded-Host (XFH) header is a de-facto standard header for identifying the original 
+                              host requested by the client in the Host HTTP request header.
+
+                              Host names and ports of reverse proxies (load balancers, CDNs) may differ from the origin server handling the request, in that case the X-Forwarded-Host header is useful to determine which Host was originally used. This header, by design, exposes privacy-sensitive information, such as the IP address of the client. Therefore the user's privacy must be kept in mind when deploying this header.
+
 # Response headers
 
 - Server            - tells you the server which is processing the request
@@ -86,8 +91,8 @@
                                   
                                   Additionally, the response header "X-content-type-options: nosniff" should be returned in all responses to reduce the likelihood that browsers will interpret content in a way that disregards the Content-type header.
 
-- X-Frame-Options       - The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed 
-                          to render a page in a <frame>, <iframe>, <embed> or <object>. Sites can use this to avoid click-jacking attacks, by ensuring that their content is not embedded into other sites.
+- X-Frame-Options       - The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be 
+                          allowed to render a page in a <frame>, <iframe>, <embed> or <object>. Sites can use this to avoid click-jacking attacks, by ensuring that their content is not embedded into other sites.
 
 # Request and Response header
 
