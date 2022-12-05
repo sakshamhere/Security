@@ -65,6 +65,8 @@ White Box Perspective
             - Defining what values are authorised, everything else is considered unauthorized
             - Useful for values that cannot be specified as parameter placeholders, such as table name
 
+        - Database specific escaping - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#database-specific-escaping-details
+
 * Additional Defences (Defence in depth)
 
     - Least Privilage

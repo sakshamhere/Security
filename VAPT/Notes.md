@@ -144,3 +144,71 @@ Exploit Database -  Offensive security exploit Database Archive
 
 
 https://www.exploit-db.com/
+
+
+*******************************************************************************************************************
+# Diff bw encoding, encryption and hashing?
+
+Encoding - it is done to ensure/preserve intigrity and the usability of data , and is reversible
+ 
+for example 
+
+- base64
+- URL emcoding, double url encoding
+- output encoding which is mainly used to safely display data exactly as a user typed it in.
+
+Hashing - it is again used to ensure the intigrity of data in this data is transformed into a fixed length alphanumeric string 
+          known as a hash which cannot be reversed
+
+An example of a hash function is: SHA512
+
+for example
+
+- Authentication - in authentication for applications, It is recommended to never store passwords and instead store only the 
+                   hash of the “salted password”. A salt is a random string appended to a password that only the authentication process system knows; this guarantees that if two users have the same password the stored hashes are different
+
+- As an example, say Alice wants to send Bob a file and verify that Bob has the exact same file and that no changes occurred in the transferring process. Alice will email Bob the file along with a hash of the file. After Bob downloads the file, he can verify the file is identical by performing a hash function on the file and verify the resulting hash is the same as Alice provided.
+
+An example of encryption is: AES 256    (AES is the Advanced Encryption Standard and is a symmetric key encryption)
+
+Encryption-  its a process of securely encoding of data to protect the confidentiality in such a way that only authorised user with key can decrypt it.
+
+Two types of encryption
+In a symmetric key, the same key is used to encrypt and decrypt data, like a password. 
+In asymmetric key encryption, one key is used to encrypt data and a different key is used to decrypt the data
+
+for example 
+
+HTTPS - uses an encryption protocol TLS/SSL which is asymmetric
+
+# what are client side attack and server side attack?
+
+Client Side attacks
+
+These specifically target the software on victims device, applications like webbrowser, email client and office suits are common target.
+
+Server side attacks
+
+These seek to compromose the data and applications present on server
+
+# SAST vs DAST
+
+SAST scans the application code at rest to discover faulty code posing a security threat, while DAST tests the running application and has no access to its source code.
+
+SAST (static application security testing (SAST))
+
+- Analyzes program source code to identify security vulnerabilities using popular security industry standards, like OWASP Top 10, SANS Top 25.
+
+- SAST supports compliance with data protection laws, HIPAA and PCI DSS
+- Guides developers to begin testing their application and identifying flaws at early development stages.
+- many developers now incorporate SAST testing into their CI/CD pipelines.
+
+popular SAST testing tools
+- Checkmarx, a tool that supports multiple programming languages.
+
+DAST (Dynamic application security testing)
+
+- DAST scans software applications in real-time against leading vulnerability sources, like the OWASP Top 10 or SANS/CWE 25
+- Simulates the actions of a malicious actor trying to break into your application remotely
+- It can also catch authentication and encryption issues allowing unauthorized access, which SAST cannot
+- Also, DAST can test other API or web services your web application connects to

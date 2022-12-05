@@ -43,7 +43,7 @@ Host header is a potential vector for exploiting a range of other vulnerabilitie
 - Classic server-side vulnerabilities, such as SQL injection
 - Business logic flaws in specific functionality
 
-# Exploiting / Testing 
+# Testing for HTTP Host header attack
 
 To test whether a website is vulnerable to attack via the HTTP Host header, you will need an intercepting proxy, such as Burp Proxy, and manual testing tools like Burp Repeater and Burp Intruder.
 
@@ -154,3 +154,12 @@ Although X-Forwarded-Host is the de facto standard for this behavior, you may co
 In Burp Suite, you can use the Param Miner extension's "Guess headers" function to automatically probe for supported headers using its extensive built-in wordlist.
 
 From a security perspective, it is important to note that some websites, potentially even your own, support this kind of behavior unintentionally. This is usually because one or more of these headers is enabled by default in some third-party technology that they use                                                    
+
+# Exploiting HTTP Host header attack
+
+Once you have identified that you can pass arbitrary hostnames to the target application, you can start to look for ways to exploit it.
+
+some examples of common HTTP Host header attacks that you may be able to construct.
+
+-   Password reset Poisoning
+    - Password reset Poisoning via Dangling markup injection
