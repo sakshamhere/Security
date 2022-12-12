@@ -28,3 +28,28 @@ Frozen sets in Python are immutable objects that only support methods and operat
 # Decorators
 
 In Decorators, functions are taken as the argument into another function and then called inside the wrapper function.
+
+# Python Subprocess check_output()
+https://data-flair.training/blogs/python-subprocess-module/#:~:text=Python%20Subprocess%20check_output(),code%20in%20the%20returncode%20attribute.
+
+This function runs the command with the arguments and returns the output.
+
+So far, the output was bound to the parent process and we couldn’t retrieve it.
+
+For a non-zero return code, it raises a CalledProcessError which has the return code in the returncode attribute.
+
+1. Syntax
+It has the following syntax-
+
+subprocess.check_output(args, *, stdin=None, stderr=None, shell=False, cwd=None, encoding=None, errors=None, universal_newlines=False, timeout=None)
+
+Examples
+Now, the example of Python Subprocess check_output
+
+>>> subprocess.check_output(["echo","Hello World!"],shell=True)
+Output
+
+b'”Hello World!”\r\n’
+
+# Logging in python
+https://realpython.com/python-logging/

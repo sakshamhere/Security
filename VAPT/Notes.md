@@ -209,6 +209,10 @@ popular SAST testing tools
 DAST (Dynamic application security testing)
 
 - DAST scans software applications in real-time against leading vulnerability sources, like the OWASP Top 10 or SANS/CWE 25
-- Simulates the actions of a malicious actor trying to break into your application remotely
+- Simulates the actions of a maln   icious actor trying to break into your application remotely
 - It can also catch authentication and encryption issues allowing unauthorized access, which SAST cannot
 - Also, DAST can test other API or web services your web application connects to
+
+# OWASP ZAP
+
+# CSRF vs clickjacking vs CORS
