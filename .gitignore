@@ -4,3 +4,5 @@
 *.hcl
 .terraform/
 env/
+venv/
+__pycache__
