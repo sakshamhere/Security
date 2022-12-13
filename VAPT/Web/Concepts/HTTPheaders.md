@@ -39,7 +39,11 @@
 - Referer                   - The Referer HTTP request header contains an absolute or partial address of the page that makes 
                               the request.This header may have undesirable consequences for user security and privacy.
 
-                              The Referer header can contain an origin, path, and querystring, and may not contain URL fragments (i.e. #section) or username:password information. The request's referrer policy defines the data that can be included.
+                              The Referer header can contain an origin, path, and querystring, and may not contain URL fragments (i.e. #section) or username:password information. 
+                              
+                              This has many fairly innocent uses, including analytics, logging, or optimized caching. However, there are more problematic uses such as tracking or stealing information, or even just side effects such as inadvertently leaking sensitive information.
+
+                              The request's referrer policy defines the data that can be included.
 
 - Referrer-Policy           - The Referrer-Policy HTTP header controls how much referrer information (sent with the Referer header) 
                               should be included with requests. Aside from the HTTP header, you can set this policy in HTML.
@@ -94,6 +98,8 @@
 - X-Frame-Options       - The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be 
                           allowed to render a page in a <frame>, <iframe>, <embed> or <object>. Sites can use this to avoid click-jacking attacks, by ensuring that their content is not embedded into other sites.
 
+- X-XSS-Protection      - The HTTP X-XSS-Protection response header is a feature of Internet Explorer, Chrome and Safari that 
+                          stops pages from loading when they detect reflected cross-site scripting (XSS) attacks
 # Request and Response header
 
 - Pragma            - Tells the browser not to store the response within the browser cache

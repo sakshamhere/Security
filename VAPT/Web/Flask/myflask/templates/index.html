@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% autoescape false %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS</title>
+</head>
+<body>
+    
+    <!-- Search form -->
+    <form method="GET">
+        <input type="text" name="q" placeholder="Search query" autocomplete="off" />
+        <input type="submit" value="Filter comments" />
+      </form>
+
+      {% if search_query %}
+
+      <!-- <div>Hello {{search_query}}</div> -->
+
+      <!-- <input type="text" value="{{search_query}}"> -->
+
+      <a href="{{search_query}}">click here</a>
+      
+      <p id="abc"></p>
+
+      {% endif %}
+      <script>
+        var pos=document.URL.indexOf("q=")+1;
+        document.write(document.URL.substring(pos,document.URL.length));
+    </script>
+
+</body>
+</html>
+{% endautoescape %}

@@ -1,3 +1,9 @@
-l = {1:2,2:3}+{4:2}
-# l.update({12,2})
-print(l)
+import re
+line = "</sc[ript>"
+# p = s.replace("<script>","")
+
+
+line = re.sub(r"[</?\[\d+>]","", line)
+
+
+print(line)
