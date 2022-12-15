@@ -1,22 +1,24 @@
-from flask import Flask, redirect, url_for, request, render_template, make_response
+from flask import Flask, redirect, url_for, request, render_template, make_response, flash
+
+import sqlite3
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '123aa8a93bdde342c871564a62282af857bda14b3359fde95d0c5e4b321610c1'
 
-
-
-@app.route('/', methods=['GET','POST']) 
+@app.route('/xss', methods=['GET','POST']) 
 def XSS():
     search_query = request.args.get('q')
     if search_query:
         # search_query = search_query.lower()
-        search_query = search_query.replace("<script>","")
+        # search_query = search_query.replace("<script>","")
 
-        # import re
-        # search_query = re.sub(r"[script</?\[\d+>]", "", search_query)
+        import re
+        search_query = re.sub(r'["</?\[\d+>]', "", search_query)
         # search_query = re.sub(r"[</script>]", "", search_query)
 
         # search_query = search_query.replace('&','&amp;')
-        # search_query = search_query.replace('<','&lt;')
+        # search_query = search_query.replace('<','&lt;')  
         # search_query = search_query.replace('>','&gt;')
         # search_query = search_query.replace('"','&quot')
         # search_query = search_query.replace("'",'&#x27')
@@ -45,11 +47,6 @@ def XSS():
 # document.write(today);
 # </sCript>
 
-
-if __name__ == "__main__":
-    app.run()
-
-
 # XSS payload
 # <script>alert(1)</script>
 # <sCript>alert(1)</sCript>
@@ -60,6 +57,35 @@ if __name__ == "__main__":
 
 # "javascript:alert('unsafe');"
 # javascript:alert('unsafe');
+
+
+@app.route('/', methods=['GET', 'POST'])
+def SQLi():
+    con = sqlite3.connect("db_users.sqlite")
+    c = con.cursor()
+    val = False
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        otp = request.form.get('otp')
+        
+        user = c.execute("SELECT * FROM users WHERE username = '{}' and password = '{}'".format(username, password)).fetchone()        
+        if user:
+            val = "Success"
+        else:
+            val = "invalid usernam and pass"
+
+    return render_template('SQLi.html',val=val)
+ 
+
+
+
+if __name__ == "__main__":
+
+    app.run()
+
+
+
 
 
 

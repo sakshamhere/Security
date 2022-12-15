@@ -19,17 +19,19 @@
 
       <!-- <div>Hello {{search_query}}</div> -->
 
-      <!-- <input type="text" value="{{search_query}}"> -->
+      <input type="text" value="{{search_query}}">
 
-      <a href="{{search_query}}">click here</a>
+      <!-- <a href="{{search_query}}">click here</a> -->
       
       <p id="abc"></p>
 
-      {% endif %}
       <script>
         var pos=document.URL.indexOf("q=")+1;
         document.write(document.URL.substring(pos,document.URL.length));
-    </script>
+     </script>
+
+      {% endif %}
+      
 
 </body>
 </html>
