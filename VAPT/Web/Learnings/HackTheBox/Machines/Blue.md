@@ -1,0 +1,1 @@
+Do This machine to manually exploit `EternalBlue` and also complete it in SMB Exploitation in ejpt certification

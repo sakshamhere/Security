@@ -1,0 +1,3 @@
+https://www.rapid7.com/blog/post/2010/01/01/safe-reliable-hash-dumping/
+
+The Metasploit Meterpreter has supported the "hashdump" command (through the Priv extension) since before version 3.0. The "hashdump" command is an in-memory version of the pwdump tool, but instead of loading a DLL into LSASS.exe, it allocates memory inside the process, injects raw assembly code, executes its via CreateRemoteThread, and then reads the captured hashes back out of memory. This avoids writing files to the drive and by the same token avoids being flagged by antivirus (AV) and intrusion prevention (HIPS) products.

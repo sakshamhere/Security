@@ -1,0 +1,46 @@
+apiVersion: networking.k8.io/v1beta1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+spec:
+  tls:                                          # to configure https forwarding
+  - hosts:
+    - myapp.com
+    secretName: myapp-secret-tls                 # refrences tls secret name
+  rules:                                         # Routing rules
+  - host: myapp.com                              # this defines that all request to this host should be transferred to internal service
+    http:                                        # the http here belongs to internal service not the domain outside
+      paths:                                     # path here defines rule for anything coming after domain name, we can define one
+      - path: /analytics
+          backend:
+            serviceName: myapp-internal-analytics-service
+            servicePort: 8080
+      - path: /shopping
+          backend:
+            serviceName: myapp-internal-shopping-service
+            servicePort: 8080
+
+# instead of having multiple paths we can also have multiple subdomains as shown in file below
+---
+apiVersion: networking.k8.io/v1beta1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+spec:
+  tls:                                          
+  - hosts:
+    - myapp.com
+    secretName: myapp-secret-tls   
+  rules:                                       
+  - host: analytics.myapp.com                              
+    http:                                        
+      paths:                                     
+        backend:
+          serviceName: myapp-internal-analytics-service
+          servicePort: 8080
+  - host: shopping.myapp.com                              
+    http:                                        
+      paths:                                     
+        backend:
+          serviceName: myapp-internal-shopping-service
+          servicePort: 8080

@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: "Flask REST API"
+  description: "An API about people and notes"
+  version: "1.0.0"
+servers:
+  - url: "/api" # By providing "/api" as the value of url, you’ll be able to access all of your API paths relative to http://localhost:8000/api.
+
+components:
+  schemas:
+    Person:
+      type: "object"
+      required:
+        - lname
+      properties:
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the person to get"
+      in: path
+      required: True
+      schema:
+        type: "string" 
+paths:
+  /people:      
+    get:                            # this creates the GET /api/people URL endpoint that you can access at http://localhost:8000/api/people.
+      operationId: "people.read_all"
+      tags:
+        - "People"
+      summary: "Read the list of people"
+      responses:
+        "200":
+          description: "Successfully read people list"
+    post:                           # this creates the POST /api/people URL endpoint that you can access at http://localhost:8000/api/people.
+      operationId: "people.create"
+      tags:
+        - People
+      summary: "Create a person"
+      requestBody:                  # in POST we also include requestbody
+          description: "Person to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "person"
+                $ref: "#/components/schemas/Person"  # here we refer our schema of Person in components we mentioned above
+      responses:
+        "201":                                       # this status will only be shoown in UI, otherwise what we sent in code will only be considered
+          description: "Successfully created person"
+
+  /people/{lname}:
+    get:                                              # to get single user details
+      operationId: "people.read_one"
+      tags:
+        - People
+      summary: "Read one person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read person"
+    put:                                              # to update user detials
+      tags:
+        - People
+      operationId: "people.update"
+      summary: "Update a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully updated person"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "person"
+              $ref: "#/components/schemas/Person"
+    delete:
+      tags:
+        - People
+      operationId: "people.delete"
+      summary: "Delete a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "204":
+          description: "Successfully deleted person"

@@ -1,0 +1,1 @@
+Located in the `/var/log `directory, these files and folders contain logging information for applications and services running on your system. The Operating System  (OS) has become pretty good at automatically managing these logs in a process that is known as "rotating".

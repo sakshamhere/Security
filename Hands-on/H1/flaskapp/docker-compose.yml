@@ -1,0 +1,17 @@
+version: "3.7"  #every docker compose needs to start with a version
+
+services:
+
+  flask:
+    build: ./flask  # this will follow this path and find dockerfile and build container
+    container_name: flask
+    restart: always
+    expose:   # will expose container to internal services
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"  # we map the host machine to our nginx container port

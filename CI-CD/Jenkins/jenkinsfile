@@ -1,0 +1,46 @@
+Pipeline{
+    agent any                       // every stage can have a or muultiple agent
+    stages{
+        stage('Build'){
+            
+            steps{
+                //
+            }
+
+        }
+        stage('Test'){
+            when{                   // the stage will execute only if when condition is true
+                expression{
+                    BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'         // these are env variable
+                }
+            }
+            
+            steps{
+                //
+            }
+        }
+        stage('Deploy'){
+            
+            steps{
+                //
+            }
+        }
+    stage('Release'){
+            
+            steps{
+                //
+            }
+        }
+    }
+    post{                               // the post executes after all stages
+        always{
+                                        // this is like finally in exception handelling as it will always execute whetehr build suceed of fails
+        }
+        success{
+                                        // this is executed it build is success
+        }
+        faulure{
+                                        // this will execute when build fails
+        }
+    }
+}
