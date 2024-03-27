@@ -1,6 +1,7 @@
 # Network Basic Input/Output System
 
 https://wirexsystems.com/resource/protocols/netbios/, https://www.lifewire.com/netbios-software-protocol-818229
+https://www.youtube.com/watch?v=Qn-2XQ-0wLg
 
 NetBIOS, an abbreviation for `Network Basic Input/Output System`, is a networking industry standard.
 
@@ -11,6 +12,9 @@ Netbios was widely used earlier for sharing files, printers, and other resource 
 NETBIOS typically runs over transport protocols such as TCP/IP, using protocols like NBT (NetBIOS over TCP/IP) to transmit data packets. 
 
 # However, in modern network environments, `NETBIOS has been largely replaced` by more advanced and secure technologies, `such as DNS (Domain Name System) for name resolution and SMB (Server Message Block) for file and printer sharing`. Additionally, the widespread adoption of Active Directory in Windows-based networks has diminished the need for NETBIOS. Despite its decline in use, some legacy systems and applications may still rely on NETBIOS for communication and resource sharing `within LANs.`
+
+# Windows today uses `NBT` (NetBIOS over TCP/IP) to communicate to other devices
+
 
 *******************************************************************************************************************************************
 # What is Netbios and its Use -
@@ -42,6 +46,13 @@ NETBIOS is an application programming interface (API) that operates at the sessi
 `Add name` to register the NetBIOS name
 `Add group name `is similar but registers the NetBIOS group name
 `Delete name `is for unregistering a NetBIOS name, whether it be a name or group
+
+# Options for `Netbios Datagram mode` on port 138
+
+`Send Datagram` will send a datagram through0. the NetBIOS name
+`Send Broadcast Datagram` is for sending a datagram to every registered NetBIOS name on the network
+`Receive Datagram` waits for a Send Datagram packet
+`Receive Broadcast Datagram` waits for a Send Broadcast packet
     
 # Options for `Netbios Session mode` on port 139
 
@@ -52,12 +63,6 @@ NETBIOS is an application programming interface (API) that operates at the sessi
 `Send No Ack` is the same as send but doesn't require an acknowledgment that it was sent through the session
 `Receive `waits for the incoming packet
 
-# Options for `Netbios Datagram mode` on port 138
-
-`Send Datagram` will send a datagram through0. the NetBIOS name
-`Send Broadcast Datagram` is for sending a datagram to every registered NetBIOS name on the network
-`Receive Datagram` waits for a Send Datagram packet
-`Receive Broadcast Datagram` waits for a Send Broadcast packet
 
 
 # Netbios Suffix Code

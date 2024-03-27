@@ -5,7 +5,6 @@
 
 # `LDAP `Light Weight Directory Access Protocol
 
-# `Kerberos` based Authentication
 
 ********************************************************************************************************************************************
 # (LM) / (LANMAN) Lan Manager Authentication
@@ -48,13 +47,3 @@ LDAP does not provide the same level of security as `Kerberos`. LDAP does not su
 
 AD maily utilizes `Kerberos` for its authentication ie  Autheticating client/service over a untrusted network.
 
-********************************************************************************************************************************************
-# Kerberos
-
-Kerberos is a protocol that serves for network authentication. This is used for authenticating clients/servers in a network using a secret cryptography key. It is designed for providing strong authentication while communicating to applications. 
-
-Kerberos is more secure than NTLM. Kerberos provides stronger encryption and is less vulnerable to common attacks such as replay attacks and brute-force attacks.
-
-Instead of passing on the login credentials over the network, as is the case with LM and NTLM protocols, the Kerberos system generates a `session key `for the user. The generated session key lasts for a designated period, providing flexibility to users when it comes to authentication.
-
-Besides the session key, the Kerberos system also generates a `token` containing all the access policies and rights associated with the user. This ensures that users only access resources they are authorized to.

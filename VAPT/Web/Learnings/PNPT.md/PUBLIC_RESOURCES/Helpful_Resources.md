@@ -81,3 +81,16 @@ https://drive.google.com/drive/folders/1CsGWRsmyJm84TAU6U0-72o4Jnb5E9xvs
 
 User - john
 pass - TwoCows2
+
+Boxes for Noobs
+
+1. Legacy
+2. Lame:   
+3. Blue:   
+4. Devel:   
+5. Jerry:   
+6. Nibbles:   
+7. Optimum:   
+8. Bashed:   
+9. Grandpa:   
+10. Netmon:   

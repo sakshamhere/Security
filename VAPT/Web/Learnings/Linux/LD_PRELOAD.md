@@ -1,6 +1,6 @@
 # LD_PRELOAD
 
-BASIC SHORT SUMMARY ANSWER - the linux executbale binaries which we call elf files for example /usr/bin/nano or any other uses dynamically linked program or we can say shared object, this is what we can replace by LD_PRELOAD env variable and put our own program with same name in place, so now when we use this env variavble before executing that binary it will use our malicious code instead of default which it should use.
+BASIC SHORT SUMMARY ANSWER - the linux executbale binaries which we call elf files for example /usr/bin/nano or any other uses dynamically linked program or we can say `shared object,` (.so) this is what we can replace by LD_PRELOAD env variable and put our own program with same name in place, so now when we use this env variavble before executing that binary it will use our malicious code instead of default which it should use.
 
 This is called `Load Time hacking` / `Function hijacking`
 
