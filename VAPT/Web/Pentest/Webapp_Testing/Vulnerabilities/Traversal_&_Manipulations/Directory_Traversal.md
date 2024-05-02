@@ -1,0 +1,3 @@
+Directory Traversal is part of “Broken Access Control” ranked #1 in the “OWASP Top-10 Vulnerabilities“
+
+Directory traversal (also known as file path traversal) is a web security vulnerability that allows an attacker to read arbitrary files on the server that is running an application. This might include application code and data, credentials for back-end systems, and sensitive operating system files.

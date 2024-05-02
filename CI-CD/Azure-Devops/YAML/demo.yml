@@ -1,0 +1,61 @@
+trigger:                                        # Continuous integration triggers.
+  - none
+
+pool:
+  vmimage: ubantu-latest                        # specifies which pool to use for a job of the pipeline
+  demands: Agent.Version -equals 2.144.0        # specify demands for a private pool
+
+
+extends:                                        # Extends a pipeline using a template
+  template:
+  parameter:
+
+stages:                                         # Stages are a collection of related jobs.
+- stage: Build
+  jobs:                                         # A job is a collection of steps run by an agent or on a server. Jobs can run conditionally and might depend on earlier jobs.
+  - job: BuildJob
+    displayName: My build job
+    continueOnError: true
+    steps:
+    - script: echo Building!
+- stage: Test
+  jobs:                                         #The jobs list specifies the jobs that make up the work of a stage.
+  - job: TestOnWindows
+    steps:
+    - script: echo Testing on Windows!
+  - job: TestOnLinux
+    steps:
+    - script: echo Testing on Linux!
+
+  - deployment: string                          # Required as first property. Name of the deployment job, A-Z, a-z, 0-9, and underscore. The word deploy is a keyword and is unsupported as the deployment name.. 
+    displayName: string                         # Human-readable name for the deployment. 
+    dependsOn: string | [ string ]              # Any jobs which must complete before this one
+    condition: string                           # Evaluate this condition expression to determine whether to run this deployment. 
+    continueOnError: string                     # Continue running even on failure?. 
+    timeoutInMinutes: string                    # Time to wait for this job to complete before the server kills it. 
+    cancelTimeoutInMinutes: string              # Time to wait for the job to cancel before forcibly terminating it. 
+    variables: variables                        # Deployment-specific variables
+    pool: pool                                  # Pool where this job will run
+    environment: deploymentEnvironment          # Target environment name and optionally a resource name to record the deployment history; format: environment-name.resource-name.
+                                                # An environment also holds information about the deployment strategy for running the steps defined inside the job.
+    environment:
+      name: string                              # Name of environment. 
+      resourceName: string                      # Name of resource. 
+      resourceId: string                        # Id of resource. 
+      resourceType: string                      # Type of environment resource. 
+      tags: string                              # List of tag filters.     
+
+      strategy: deploymentStrategy              # Execution strategy for this deployment
+        runOnce:                                # default strategy, The runOnce deployment strategy rolls out changes by executing each of its steps one time
+                                                # runOnce is the simplest deployment strategy wherein all the lifecycle hooks, 
+                                                # namely preDeploy deploy, routeTraffic, and postRouteTraffic, are executed once. Then, either on: success or on: failure is executed.
+          
+    workspace:                                  # Workspace options on the agent.
+      clean: string                             # Which parts of the workspace should be scorched before fetching.  (outputs, resources, all)
+    uses:                                       # Any resources required by this job that are not already referenced
+      repositories: [ string ]                  # Repository references 
+      pools: [ string ]                         # Pool references 
+    container: jobContainer                     # Container resource name
+    services:                                   # Container resources to run as a service container.
+      string: string                            # Name/value pairs.
+    templateContext:                            # Deployment related information passed from a pipeline when extending a template. See remarks for more information.

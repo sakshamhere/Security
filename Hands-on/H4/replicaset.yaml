@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replics according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:       # this template is simply  the configuration of pod ecculing the first two lines ie apiversion and kind
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx

