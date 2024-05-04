@@ -112,7 +112,8 @@
     - `browsh --startup-url 192.102.102.3`
     - `lynx http://192.102.102.3`
 
-- WebDav Enumeration
+###### WebDav 
+-
     - Http methods supported by /webdav
         - `nmap -p 80 -sV 10.5.17.75 --script http-methods --script-args http-methods.url-path=/webdav/`
     - Webdav scan
@@ -120,7 +121,32 @@
     - Checking files that can be uploaded
         - `davtest -auth bob:password_123321 -url http://10.5.27.32`
 
-- Wordpress Enumeration
+###### Wordpress 
+
+**ENUMERATION**
+
+- /robots.txt
+    -  `/robots.txt`- presence of the `/wp-admin` and `/wp-content` will confirm we are dealing with wordpress.`/wp-admin` Typically attempting to browse to the `wp-admin` directory will redirect us to the `wp-login.php`, `wp-content/plugins` This folder is helpful to enumerate vulnerable plugins. `wp-content/themes` These files should be carefully enumerated as they may lead to RCE.
+
+- Inpect Source Code
+    - grepping wordpress to confirm its wordpress 
+        - `curl -s http://blog.inlanefreight.local | grep WordPress`
+    - grepping themes on pages
+        - `curl -s http://blog.inlanefreight.local/ | grep themes`
+    - grepping plugins on pages
+        - `curl -s http://blog.inlanefreight.local | grep plugins `
+
+
+**ATTACKS**
+
+- Themes with known vulnerabilities
+
+- Plugins with known vulnerabilities
+
+
+
+
+
     - Enumerate Plugins and Users on wordpress
         - `wpscan --url http://10.10.207.150/blog/ -e vp,u`
     - Brute Force for any username (in this case admin)
