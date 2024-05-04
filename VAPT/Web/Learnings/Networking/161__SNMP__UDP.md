@@ -1,6 +1,14 @@
 # Simple Network Management Protocol
 https://www.youtube.com/watch?v=Lq7j-QipNrI
 
+Simple Network Management Protocol (SNMP) was created to monitor network devices. In addition, this protocol can also be used to handle configuration tasks and change settings remotely.
+
+SNMP-enabled hardware includes routers, switches, servers, IoT devices, and many other devices that can also be queried and controlled using this standard protocol. 
+
+Thus, it is a protocol for monitoring and managing network devices. In addition, configuration tasks can be handled, and settings can be made remotely using this standard.
+
+The current version is `SNMPv3`.
+
 
 SNMP is protocol used to collect and organize device information on a network and it does this over `UDP port 161`
 

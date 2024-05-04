@@ -38,13 +38,26 @@ The Domain allows Travel booking and services
 
 Not much info found
 
-# 2. Checking crt.sh
+# 2. Checking crt.sh for subdomains
 
 Got total 678 subdomains from crt.sh, saved them in a file `subdomains.txt`
 
 ┌──(kali㉿kali)-[~]
 └─$ `curl -s https://crt.sh/\?q\=booking.com\&output\=json | python -m json.tool | grep common_name | cut -d":" -f2 | cut -d'"' -f2 | sort -u >> subdomains.txt`
 
+# 3. Findings subdomains by bruteforcing
+
+We can bruteforce anything.booking.com by using wordlist, we will use Seclists subdomains-top1million-5000.txt
+https://github.com/danielmiessler/SecLists/blob/master/Discovery/DNS/subdomains-top1million-5000.txt
+
+
+┌──(kali㉿kali)-[~]
+└─ `for sub in $(cat subdomains-top1million-5000.txt); do dig @8.8.8.8 any $sub.booking.com | grep -v ';\|SOA' | sed -r '/^\s*$/d' | grep $sub | tee -a subdomains.txt;done`
+
+# 3. Finding subdomains using DNSenum
+
+──(kali㉿kali)-[~]
+└─$ `dnsenum --dnsserver 8.8.8.8 --enum -p 0 -s 0 -o subdomains.txt -f subdomains-top1million-5000.txt  booking.com`
 
 
 # 3. List Company Hosted Servers
@@ -63,10 +76,15 @@ Now we have Ip addresses of servers hosted by company, lets use shodan to get mo
 # 4. DNS Records
 
 We got 
-- `A` Record which we already know apart from that 
-- `NS` Record which are nameservers used to resolve FQDN to IP address
-- `MX` Records which are mail servers
-- `TXT` Records which gives more info
+- `A`    Returns an IPv4 address of the requested domain as a result., Record which we already know apart from that 
+- `AAAA` Returns an IPv6 address of the requested domain.
+- `NS`   Record which are nameservers used to resolve FQDN to IP address
+- `MX`   Returns the responsible mail servers as a result.
+- `TXT`  This record can contain various information. The all-rounder can be used, e.g., to validate the Google Search Console or validate SSL 
+         certificates. In addition, SPF and DMARC entries are set to validate mail traffic and protect it from spam.
+- `SOA`  Provides information about the corresponding DNS zone and email address of the administrative contact.
+- `CNAME` 	This record serves as an alias. If the domain www.hackthebox.eu should point to the same IP, and we create an A record for one and a 
+           CNAME record for the other.
 
 The Core information we can see right now is
 

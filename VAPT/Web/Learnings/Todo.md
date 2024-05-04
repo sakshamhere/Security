@@ -3,6 +3,8 @@
 Corporate OSINT
 
 
+
+
 **********************
 
 # Azure Revision

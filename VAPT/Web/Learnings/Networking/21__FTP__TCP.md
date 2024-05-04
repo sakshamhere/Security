@@ -59,3 +59,44 @@ NOTE
 - SFTP: The transmission from FTPS through SSH
 
 - "anonymous" is username that is used over FTP when you want to log in without having an account
+
+************************************************************************************************************************************************
+
+# Default Configuration
+
+One of the most used FTP servers on Linux-based distributions is `vsFTPd`. The default configuration of vsFTPd can be found in `/etc/vsftpd.conf`, and some settings are already predefined by default. It is highly recommended to install the vsFTPd server on a VM and have a closer look at this configuration.
+
+
+# Dangerous Settings
+
+There are many different security-related settings we can make on each FTP server. These can have various purposes, such as testing connections through the firewalls, testing routes, and authentication mechanisms. One of these authentication mechanisms is the anonymous user. This is often used to allow everyone on the internal network to share files and data without accessing each other's computers. With vsFTPd, the optional settings that can be added to the configuration file for the anonymous login look like this:
+
+anonymous_enable=YES 	        Allowing anonymous login?
+anon_upload_enable=YES 	        Allowing anonymous to upload files?
+anon_mkdir_write_enable=YES 	Allowing anonymous to create new directories?
+no_anon_password=YES 	        Do not ask anonymous for password?
+anon_root=/home/username/ftp 	Directory for anonymous.
+write_enable=YES 	            Allow the usage of FTP commands: STOR, DELE, RNFR, RNTO, MKD, RMD, APPE, and SITE?
+
+# FTP Users
+
+In addition, there is a file called `/etc/ftpusers` that we also need to pay attention to, as this file is used to deny certain users access to the FTP service. 
+
+In the following example, the users below are not permitted to log in to the FTP service, even if they exist on the Linux system.
+
+┌──(kali㉿kali)-[~]
+└─$ `cat /etc/ftpusers`   
+# /etc/ftpusers: list of users disallowed FTP access. See ftpusers(5).
+
+root
+daemon
+bin
+sys
+sync
+games
+man
+lp
+mail
+news
+uucp
+nobody
