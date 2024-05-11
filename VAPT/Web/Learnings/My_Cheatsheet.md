@@ -180,7 +180,7 @@
         - `curl -s http://app-dev.inlanefreight.local:8080/docs/ | grep Tomcat `
 
 - General Folder Structure
-
+```
 ├── bin
 ├── conf
 │   ├── catalina.policy
@@ -203,7 +203,7 @@
 └── work
     └── Catalina
         └── localhost
-
+```
 #### **SMB**
 
 - SMB version
