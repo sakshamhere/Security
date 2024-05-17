@@ -1,1 +1,0 @@
-Ping Federate or Ping Access and Trustbuilder are two IAM products that can be used for Identitity and Access Managemnent

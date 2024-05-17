@@ -1,9 +1,0 @@
-name: run shell command
-on: [push]
-
-jobs:
-  run-shell-command:
-    run-on: ubuntu-latest
-    steps:
-      - name: Echo a string
-        run: echo "Saksham is best"
