@@ -1,4 +1,8 @@
 
+1. Read Web Techniques
+
+https://blog.securitybreached.org/2023/08/18/bug-bounty-blueprint-a-beginners-guide/
+
 
 Corporate OSINT
 
