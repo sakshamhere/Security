@@ -1,51 +1,31 @@
 
-Target  - eCPPT
+Main Plan
 
-# INE Material (obviously):
+1. Complete enumeration properly
 
-All 
+2. Complete AD attacks and enumeration properly
 
-# TryHackMe
+3. Check if anything free remaining on tryhackme which can be covred
 
-- Wreath (completed already)
-- Internal (completed already)
-
-- Tiberius Buffer Overflow Prep Room on THM (this solidified it)
-
-# HackTheBox
-
-IppSec Videos of the Easy Boxes and then replicating the same steps the next day.
-
-# Buffer Overflow
-
-- TCM Buffer Overflow Video
-
-- Tiberius Buffer Overflow Prep Room on THM (this solidified it)
-
-methodology and exploit development
-
-- https://github.com/Tib3rius/Pentest-Cheatsheets/blob/master/exploits/buffer-overflows.rst
-
-- https://github.com/gh0x0st/Buffer_Overflow
-
-- https://boschko.ca/braindead-buffer-overflow-guide-to-pass-the-oscp-blindfolded/
-
-# Pivoting
-
-- Wreath (completed already)
-- https://pentest.blog/explore-hidden-networks-with-double-pivoting/
-- https://www.youtube.com/watch?v=QNoIX1au_CM
+4. Start Hackthebox boxes and keep updating things
 
 
-- SANS Cheatsheet - https://sansorg.egnyte.com/dl/kZpaAx3eX0
+Things to keep doing simulteneously
+
+- Organize web attck tehniques
+- Revise Azure
+
+Tryhackme Room
+
+- Red Team Capstone Challange
+    (Enterprise AD Network)
+
+- Bandit
+    (HTTP Request Smuggling)
 
 
-# Pass the Hash
 
-https://www.hackingarticles.in/lateral-movement-pass-the-hash-attack/
+Target
 
-#  Additional Resources
-
-- eCPPT Field Manual: https://drive.google.com/file/d/1wC7RMTrWjt74rO8u4X-zM89T_hZzF_A5/edit (found this last minute and it has some excellent commands) 
-
-    
+- Dante Pro Lab
+- OSCP

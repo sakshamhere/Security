@@ -1,5 +1,5 @@
   
-# smbclient - `ftp-like client to access SMB/CIFS resources on servers`  (A part of SAMBA suite itself)
+# smbclient - `ftp-like client to access SMB/CIFS(common internet file system)  resources on servers`  (A part of SAMBA suite itself)
 
 
 Usage: smbclient [-?EgqBNPkV] [-?|--help] [--usage] [-M|--message=HOST] [-I|--ip-address=IP] [-E|--stderr] [-L|--list=HOST] [-T|--tar=<c|x>IXFvgbNan] [-D|--directory=DIR] [-c|--command=STRING] [-b|--send-buffer=BYTES]
