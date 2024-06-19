@@ -69,7 +69,10 @@ So This is how we solve the IP address exhaution by using private IP address alt
 
 IPv4 and IPv6 are Layer 3 Protocols, Layer 3 is Netowrk Layer, which bacially provides network routing , includes devices like Router
 
+# Security
 
+`ICMP redirect`: Similar to route table manipulation, an out-of-band message is sent to a device informing it of a better route through a network. That route leads the host to connect to the attacker’s machine.
 
+`UDP flood` (DDoS): Floods ports on the host server with UDP packets.
 
-
+`SYN flood` (DDoS): A connection is initiated without finalizing the connection. Because the server has to “wait” for half-opened connections to process, it is overwhelmed and can no longer respond to legitimate traffic.
