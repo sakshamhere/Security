@@ -194,7 +194,7 @@ https://stackoverflow.com/questions/35374491/how-does-the-client-verify-servers-
 
 6. So using all these 3 things they both generate a Master key. using this master key symmetric keys will be derived.
 
-7. So now Using MAster key 4 keys are derived
+7. So now Using MAster key 4 keys are derived which wull be used to have encrypted connection from both sides.
 
 
 ********************************************************************************************************************************************************
