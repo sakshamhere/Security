@@ -1,6 +1,6 @@
 # `Local Port forwarding with Socat`
 
-ocat is not just great for fully stable Linux shells[1], it's also superb for port forwarding. 
+Socat is not just great for fully stable Linux shells[1], it's also superb for port forwarding. 
 
 The one big disadvantage of socat, is that it is very rarely installed by default on a target. 
 

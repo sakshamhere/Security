@@ -30,7 +30,7 @@ Some Facts
   
   - If the requested IP address is not local, then the client machine refers to its routing table to find out which gateway to send the packet to.
 
-  - In most circumstances the first packet sent out will be an ARP request to find the MAC address of the default gateway, if it's not already in the ARP cache.
+  - In most circumstances the first packet sent out will be an `ARP request` to find the MAC address of the default gateway, if it's not already in the ARP cache.
 
   - Then it sends the DNS query via the gateway. In this case the packet is sent with the DNS server's IP address in the IP destination field, but with the gateway's MAC address on the ethernet packet. DNS lookup will be performed in below caches.
     - Your Router's DNS server Cache

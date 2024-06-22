@@ -21,7 +21,7 @@ https://www.offsec.com/wp-content/uploads/2023/03/pen-200-pwk-syllabus.pdf
 5. Command Injection
     - Understand how to leverage command injection to gain system access
 
-6. SQL Injection Attacks 
+6. SQL Injection Attacks directory traversaldirectory traversal
     - UNION SQLi payloads, Error SQLi payloads, Blind SQLi payloads
     - Exploit MSSQL Databases with xp_cmdshell
     - Automate SQL Injection with SQLmap
