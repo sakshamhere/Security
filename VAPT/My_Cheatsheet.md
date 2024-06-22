@@ -84,10 +84,10 @@
 nmap --script ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221,tftp-enum -p 21 10.11.1.111
 ```
 **Check for FTP Version** 
-(ProFTPD, VSFTPD etc..) Version might be old and vulnerable for which public exploit might exist
+>(ProFTPD, VSFTPD etc..) Version might be old and vulnerable for which public exploit might exist
 
 **Check for Anonymous login if allowed** 
-ftp 192.60.4.3 - Provide blank for password while making FTP connection
+>ftp 192.60.4.3 - Provide blank for password while making FTP connection
 
 **Brute Force to get access**
 ```
@@ -97,7 +97,7 @@ hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr
 nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 ```
 **Check data and hints**
-There might be username, credentials, or other important clue available
+> There might be username, credentials, or other important clue available
 
 | Command  | Usage |
 | ------------- | ------------- |
