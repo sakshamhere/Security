@@ -83,11 +83,11 @@
 ```
 nmap --script ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221,tftp-enum -p 21 10.11.1.111
 ```
-- Check for FTP Version (ProFTPD, VSFTPD etc..)
+Check for FTP Version (ProFTPD, VSFTPD etc..)
 
 > Version might be old and vulnerable for which public exploit might exist
 
-- Check for Anonymous login if allowed
+Check for Anonymous login if allowed
 
 > ftp 192.60.4.3 - Provide blank for password while making FTP connection
 
