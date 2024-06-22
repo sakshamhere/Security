@@ -78,7 +78,7 @@
 
 ### [ENUMERATING & EXPLOITING SERVICES](#)
 
-#### 21.FTP
+#### 21 FTP
 
 - [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
     - `nmap 192.60.4.3 -sV -p 21`
@@ -113,7 +113,11 @@
 #### 53.DNS
 
 
-#### **General Web Recon**
+
+
+#### 80.HTTP
+
+###### Basic Enumeration
 
 - DNS Enumeration
     - `nslookup`, `host`, `dig`, `DNSRecon`(python tool)
@@ -138,8 +142,6 @@
     - `dirb http://192.102.102.3 /usr/share/metasploit-framework/data/wordlists/directory.txt `
     - `gobuster -u http://10.10.93.218/ -w /usr/share/wordlists/dirbuster/directory-list-1.0.txt dir `
     - `use auxiliary/scanner/http/brute_dirs` / `use auxiliary/scanner/http/dir_scanner`
-
-#### 80.HTTP
 
 - Server Banner and version
     - `use auxiliary/scanner/http/http_version`
