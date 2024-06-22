@@ -85,12 +85,15 @@
 > Version might be old and vulnerable for which public exploit might exist
 
 - Check for Anonymous login if allowed
-    - `ftp 192.60.4.3 ` 
-    - `nmap 192.176.71.3 -p 21 --script ftp-anon`
 
-> Provide blank for password while making FTP connection using ftp 192.60.4.3
+```
+# Provide blank for password while making FTP connection
+ftp 192.60.4.3 
+nmap 192.176.71.3 -p 21 --script ftp-anon
+```
 
-- FTP connection - `ftp 192.60.4.3 `
+- 
+
 - Uploading and Downloading files
     - ftp> `get secret.txt`
 
