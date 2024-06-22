@@ -81,7 +81,8 @@
 #### 21 FTP
 
 1. Check for FTP Version (ProFTPD, VSFTPD etc..)
-    - version might be old vulnerable for which known exploit might exist
+
+> version might be old vulnerable for which known exploit might exist
 
 2. Check for Anonymous login if allowed
     - `ftp 192.60.4.3 ` (provide blank password)
