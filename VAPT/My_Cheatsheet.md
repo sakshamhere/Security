@@ -80,12 +80,10 @@
 
 #### 21 FTP
 
-1. Check for FTP Version - version might be vulnerable - known exploit might exist
+1. Check for FTP Version (ProFTPD, VSFTPD etc..)
+    - version might be old vulnerable for which known exploit might exist
 
--  Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
-    - `nmap 192.60.4.3 -sV -p 21`
-
-- [ ] Anonymous login: Check if FTP Anonymous login is allowed
+2. Check for Anonymous login if allowed
     - `ftp 192.60.4.3 ` (provide blank password)
     - `nmap 192.176.71.3 -p 21 --script ftp-anon`
 
