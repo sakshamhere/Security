@@ -91,20 +91,20 @@ Check for Anonymous login if allowed
 
 > ftp 192.60.4.3 - Provide blank for password while making FTP connection
 
-- Brute Force to get access
+Brute Force to get access
 ```
 hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt 192.60.4.3 ftp
 ```
 ```
 nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 ```
-- Useful Commands
-> [!CAUTION]
-> Advises about risks or negative outcomes of certain actions.
-- Uploading and Downloading files
-    - ftp> `get secret.txt`
+Check data and hints
+> There might be username, credentials, or other important clue available
 
-> Note ftp 192.60.4.3
+| Command  | Usage |
+| ------------- | ------------- |
+| get  | Get file from the remote computer. |
+| mget  | mget |
 
 
 
