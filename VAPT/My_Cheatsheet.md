@@ -83,13 +83,11 @@
 ```
 nmap --script ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221,tftp-enum -p 21 10.11.1.111
 ```
-**Check for FTP Version** (ProFTPD, VSFTPD etc..)
+**Check for FTP Version** 
+(ProFTPD, VSFTPD etc..) Version might be old and vulnerable for which public exploit might exist
 
-> Version might be old and vulnerable for which public exploit might exist
-
-**Check for Anonymous login** if allowed
-
-> ftp 192.60.4.3 - Provide blank for password while making FTP connection
+**Check for Anonymous login if allowed** 
+ftp 192.60.4.3 - Provide blank for password while making FTP connection
 
 **Brute Force to get access**
 ```
@@ -99,13 +97,14 @@ hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr
 nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 ```
 **Check data and hints**
-> There might be username, credentials, or other important clue available
+There might be username, credentials, or other important clue available
 
 | Command  | Usage |
 | ------------- | ------------- |
-| get  | Get file from the remote computer. |
-| mget  | mget |
-
+| ls  | list files |
+| get  | Get a file from the remote computer. |
+| mget  | Download everything |
+| put  | Send/upload one file. |
 
 
 #### 22 SSH
