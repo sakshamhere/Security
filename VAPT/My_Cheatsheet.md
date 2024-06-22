@@ -82,11 +82,13 @@
 
 - Check for FTP Version (ProFTPD, VSFTPD etc..)
 
-> version might be old vulnerable for which known exploit might exist
+> Version might be old and vulnerable for which public exploit might exist
 
 - Check for Anonymous login if allowed
-    - `ftp 192.60.4.3 ` (provide blank password)
+    - `ftp 192.60.4.3 ` 
     - `nmap 192.176.71.3 -p 21 --script ftp-anon`
+
+> Provide blank for password while making FTP connection using ftp 192.60.4.3
 
 - FTP connection - `ftp 192.60.4.3 `
 - Uploading and Downloading files
