@@ -80,7 +80,6 @@
 
 #### 21 FTP
 
-- Nmap Script
 ```
 nmap --script ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221,tftp-enum -p 21 10.11.1.111
 ```
@@ -91,12 +90,17 @@ nmap --script ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-ba
 - Check for Anonymous login if allowed
 
 > ftp 192.60.4.3 - Provide blank for password while making FTP connection
-```
-nmap 192.176.71.3 -p 21 --script ftp-anon
-```
 
-- 
-
+- Brute Force to get access
+```
+hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr/share/metasploit-framework/data/wordlists/unix_passwords.txt 192.60.4.3 ftp
+```
+```
+nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
+```
+- Useful Commands
+> [!CAUTIOxN]
+> Advises about risks or negative outcomes of certain actions.
 - Uploading and Downloading files
     - ftp> `get secret.txt`
 
