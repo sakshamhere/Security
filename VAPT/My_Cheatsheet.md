@@ -99,7 +99,7 @@ hydra -L /usr/share/metasploit-framework/data/wordlists/common_users.txt -P /usr
 nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 ```
 - Useful Commands
-> [!CAUTIOxN]
+> [!CAUTION]
 > Advises about risks or negative outcomes of certain actions.
 - Uploading and Downloading files
     - ftp> `get secret.txt`
