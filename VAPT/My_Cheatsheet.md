@@ -91,7 +91,9 @@
 - Uploading and Downloading files
     - ftp> `get secret.txt`
 
-> Note
+> Note ftp 192.60.4.3
+
+
 
 #### 22 SSH
 
