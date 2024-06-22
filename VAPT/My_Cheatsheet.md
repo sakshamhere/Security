@@ -91,6 +91,8 @@
 - Uploading and Downloading files
     - ftp> `get secret.txt`
 
+> Note
+
 #### 22 SSH
 
 - OpenSSH version 
