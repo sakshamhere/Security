@@ -71,7 +71,7 @@
 - Tracing newtwork packet
     - `nmap -vv -n -A -T4 -Pn --packet-trace 192.168.29.193`
 
-- Agrssive Complete Scans
+- Agressive Complete Scans
 ```
 nmap -v -sT -A -T4 -p- -Pn --script vuln -oA full 10.11.1.111
 ```
@@ -109,11 +109,11 @@ nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 ********************************************************************************
 
 #### 22 SSH
-
+```
+nmap 192.238.103.3 -p 22 -sV 
+```
 **Check OpenSSH version**
 >Note that only openssh versions less than 7 are vulnerable
-- `nmap 192.238.103.3 -p 22 -sV -O`
-- `nc 192.238.103.3 22`
 
 **Make SSH connection** 
 - `ssh root@192.238.103.3`
@@ -134,11 +134,84 @@ $ /usr/share/john/ssh2john.py id_rsa > id_rsa.txt
 ```
 john id_rsa.txt --wordlist=rockyou.txt
 ```
+********************************************************************************
 
 #### 23 Telnet
-#### 25 SMTP
-#### 53 DNS
+```
+telnet 10.11.1.111 23
+```
+**Grab Telnet Banner**
+```
+nc -vn {IP} 23
+```
+**Telnet into a machine**
+********************************************************************************
 
+#### 25 SMTP
+```
+nmap -p25,465,587 --script=smtp-commands,smtp-open-relay,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 10.10.10.10 -v
+
+```
+**Version Info**
+```
+telnet example.com 587
+```
+**Find Mail servers of an organization**
+> The result is a list of all systems responsible for incoming mail for that domain
+```
+dig +short mx google.com
+```
+**UserName Enumeration**
+- Enumerate uses with `smtp-user-enum`
+```
+smtp-user-enum -M VRFY -U {Big_Userlist} -t {IP}
+smtp-user-enum -M VRFY -U /usr/share/wordlists/metasploit/unix_users.txt -t $ip
+smtp-user-enum -M VRFY -U /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames-dup.txt  -t $ip
+```
+**Connect with SMTP**
+```
+telnet 192.72.183.3 25
+
+# connect with SMTPS
+openssl s_client -crlf -connect {IP}:465
+openssl s_client -starttls smtp -crlf -connect {IP}:587
+```
+**Brute Force**
+```
+hydra -P /usr/share/wordlists/rockyou.txt 192.72.183.3 smtp -V
+```
+**Enumeration Commands**
+| Command  | Usage |
+| ------------- | ------------- |
+| HELO  | command to start conversation identifying the sender server and is generally followed by its domain name. |
+| EHLO  | An alternative command to start the conversation|
+| VRFY  | Verify whether a particular email address or username actually exists on server.|
+| EXPN  | This command displays the actual mailing address for aliases and mailing lists. |
+| MAIL FROM | It identifies the sender of the email |
+| RCPT TO | It identifies the recipient of the email |
+```
+$ telnet 10.0.0.1 25
+Trying 10.0.0.1...
+Connected to 10.0.0.1.
+Escape character is '^]'.
+220 myhost ESMTP Sendmail 8.9.3
+HELO
+501 HELO requires domain address
+HELO x
+250 myhost Hello [10.0.0.99], pleased to meet you
+VRFY root
+250 Super-User <root@myhost>
+EXPN root
+250 Super-User <root@myhost>
+MAIL FROM:root
+250 root... Sender ok
+RCPT TO:root
+250 root... Recipient ok
+```
+********************************************************************************
+
+#### 53 DNS
+#### 69 TFTP
 
 
 
