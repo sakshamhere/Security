@@ -71,10 +71,10 @@
 - Tracing newtwork packet
     - `nmap -vv -n -A -T4 -Pn --packet-trace 192.168.29.193`
 
-- Agrssive Scans
-    - NMAP
-        - `nmap -A -T4 <ip>`
-        - `nmap -A -<ip>`
+- Agrssive Complete Scans
+```
+nmap -v -sT -A -T4 -p- -Pn --script vuln -oA full 10.11.1.111
+```
 
 ### [ENUMERATING & EXPLOITING SERVICES](#)
 
@@ -115,14 +115,24 @@ nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 - `nmap 192.238.103.3 -p 22 -sV -O`
 - `nc 192.238.103.3 22`
 
-- **Make SSH connection** 
+**Make SSH connection** 
 - `ssh root@192.238.103.3`
 - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
 - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
 
-- **Brute Force**
+**Brute Force**
 ```
 hydra -l student -P /usr/share/wordlists/rockyou.txt 192.72.183.3 ssh
+nmap 192.72.183.3 -p 22 --script ssh-brute --script-args userdb=/root/user
+```
+**Cracking private key/id_rsa**
+- This key cannot be cracked until we have turned it into a hash that John can crack. we can do that using `ssh2john.py`
+```
+$ /usr/share/john/ssh2john.py id_rsa > id_rsa.txt
+```
+- Crack it
+```
+john id_rsa.txt --wordlist=rockyou.txt
 ```
 
 #### 23 Telnet
