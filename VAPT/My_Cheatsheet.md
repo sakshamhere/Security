@@ -245,31 +245,29 @@ This is a test message.
 ********************************************************************************
 
 #### 53 DNS
-***host**
+**DNS Enumeration**
 ```
+# host
 host www.megacorpone.com
 host -t mx megacorpone.com
 host -t txt megacorpone.com
-```
-**nslookup**
-```
+
+# nslookup
 nslookup amazon.in
 nslookup -type=MX amazon.in
-```
-**dig**
-```
+
+# dig
 dig amazon.in
 dig mx amazon.in
 dig +short mx dtcc.com
-```
-**dnsrecon**
-```
+
+# dnsrecon
 dnsrecon -d amazon.in
-```
-**Enumerate & Brute Force by dnsenum**
-```
+
+# dnsenum (will enumerate every possible thing)
 dnsenum amazon.in
 ```
+
 **DNS Zone Transfer attack**
 
 
