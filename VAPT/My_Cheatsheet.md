@@ -247,7 +247,7 @@ This is a test message.
 #### 53 DNS
 **DNS Enumeration**
 ```
-# host
+#host
 host www.megacorpone.com
 host -t mx megacorpone.com
 host -t txt megacorpone.com
@@ -256,15 +256,15 @@ host -t txt megacorpone.com
 nslookup amazon.in
 nslookup -type=MX amazon.in
 
-# dig
+#dig
 dig amazon.in
 dig mx amazon.in
 dig +short mx dtcc.com
 
-# dnsrecon
+#dnsrecon
 dnsrecon -d amazon.in
 
-# dnsenum (will enumerate every possible thing)
+#dnsenum (will enumerate every possible thing)
 dnsenum amazon.in
 ```
 
