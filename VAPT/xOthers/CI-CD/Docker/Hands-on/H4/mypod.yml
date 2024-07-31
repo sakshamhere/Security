@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginxwebserver
+  labels:
+    env: dev
+spec:
+  containers:
+    - image: nginx
+      name: democontainer
+      ports:                        # similar to EXPOSE in docker
+        - containerPort: 8080   
+  nodeSelector:
+    disk: ssd
+  tolerations:
+    - key: "key1"
+      operator: "Equal"
+      value: "value1"
+      effect: "NoSchedule"
+

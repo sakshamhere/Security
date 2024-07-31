@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-name
+  namespace: default
+spec:
+  storageClsssName: manual
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+  # below is PVC configuration in case claim is for storage class
+
+--- 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-name
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: storga-class-name

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment                           # what we want to create
+metadata:
+  name: my-nginx                           # Name of deployment
+  namespace: default
+  labels:
+    app: nginx
+spec:                                      # specification for deployment
+  replicas: 2                              # Replicas we want to create
+  selector:
+    matchLabels:
+      app: nginx
+  template:                                # template that include specification which is blueprint for pods
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16
+        ports:
+        - containerPort: 8080
+      - volumeMounts:                      # volume needs to mounted on container level
+        - mountPath: "/var/www/html"
+          name: mypd
+      volumes:
+      - name: mypd
+        persistentVolumeClaim:
+          claimName: pvc-name              # voliume mounted on Pod level
+
+

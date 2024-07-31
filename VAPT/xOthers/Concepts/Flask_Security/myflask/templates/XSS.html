@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% autoescape false %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS</title>
+</head>
+<body>
+    
+    <!-- Search form -->
+    <form method="GET">
+        <input type="text" name="q" placeholder="Search query" autocomplete="off" />
+        <input type="submit" value="Filter comments" />
+      </form>
+
+      {% if search_query %}
+
+      <div>Hello {{search_query}}</div> <!--This is an attack vector, best solution is encoding-->
+
+      <input type="text" value="{{search_query}}"> <!--This is an attack vector, best is to use double quotes"{{search_query}}"-->
+
+      <a href="{{search_query}}">click here</a> <!--This is an attack vector, best is to use output encoding-->
+      
+      {% endif %}
+
+      <h1><span>0 search results for '</span><span id="searchMessage"></span><span>'</span></h1>
+
+<!-- below is example of DOM XSS, best is to avoid using dangerous sink-->
+
+      <script>
+        // var pos=document.URL.indexOf("q=")+1;
+        // document.write(document.URL.substring(pos,document.URL.length));
+
+// Source = location.search   Sink= document.write
+
+        // var query = (new URLSearchParams(window.location.search)).get('q');
+        // if(query){
+        //   document.write('<p>Hello'+query+'</p>');
+        //   document.write('<img src="'+query+'"')  
+        // } 
+
+// Source = location.search   Sink = innerHTML
+
+        var query = (new URLSearchParams(window.location.search)).get('q');
+        if(query){
+          document.getElementById('searchMessage').innerHTML=query+"sasa";
+        }
+
+     </script>
+
+      
+      
+
+</body>
+</html>
+{% endautoescape %}

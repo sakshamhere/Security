@@ -1,0 +1,1 @@
+Do this to exploit RDP, `BlueKeep` vulnerability

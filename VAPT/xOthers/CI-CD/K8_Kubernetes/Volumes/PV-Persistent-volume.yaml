@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: PersistentVolume 
+metadata:
+  name: pv-name
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem            # We can any , like remote file storage in this case, we could have local disk or may be cloud storage
+  accessMode:
+  - ReadWriteOnce
+  PersistentVolumeReclaimPolicy: Recycle
+  StorageClassName: slow
+  mountOptions:
+  - hard
+  - nfsvers=4.0
+  nfs:
+    path: /dir/path/on/nfs/server
+    server: nfs-server-ip-adress
+
+# below is example where we use Google cloud as storage
+# Some of the attributes will always differ which are specific to storage type
+---
+apiVersion: v1
+kind: PersistentVolume 
+metadata:
+  name: pv-cloud-volume
+  labels:
+    failure-domain.beta.kubernetes.io/zone: us-centrall-a__us-centrall-b
+spec:
+  capacity:
+    storage: 400Gi
+  accessMode:
+  - ReadWriteOnce
+= gcePersistentDisk:
+    pdName: my-data-disk
+    fsType: ext4
+
+# below is example where we use Google cloud as storage
+---
+apiVersion: v1
+kind: PersistentVolume 
+metadata:
+  name: pv-localdisk-storage
+spec:
+  capacity:
+    storage: 100Gi
+  volumeMode: Filesystem            # We can any , like remote file storage in this case, we could have local disk or may be cloud storage
+  accessMode:
+  - ReadWriteOnce
+  PersistentVolumeReclaimPolicy: Delete
+  StorageClassName: local-storage
+  local:
+    path: /mnt/disk/ssd1
+  nodeaffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - example-node  
