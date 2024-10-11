@@ -1,17 +1,17 @@
 
-- Recon
+> Recon
 
 21 FTP 
 
+ 
 
 
 
+> Initial Access
 
-- Initial Access
+> Exploit
 
-- Exploit
+> Privilege Escalation 
 
-- Privilege Escalation 
-
-- Pawn
+> Pawn
 
