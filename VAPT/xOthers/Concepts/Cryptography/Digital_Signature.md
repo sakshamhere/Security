@@ -9,11 +9,11 @@ Like `HMACs`, digital signatures also employ a hash function and a shared key. H
 exmple - RS256
 
 
-So how this works is like you hash the document/message and then encrypt using private key,  now you send the signature and and public key to reciever
+So how this works is like you hash the document/message and then encrypt using private key,  now you send the signature and and public key to reciever.
 
 reciever now takes your document and generates a hash, also he decrypts the signature using public key, if both results match then only it is accepted.
 
-s
+
 # why we hash before encrypting using private key?
 
 We encrypt is because document can be verry large or very small, and algorithm like RSA would create same lenght of signature.

@@ -1,4 +1,8 @@
 
+
+Note all Privilege Esclation Techniques
+
+
 Main Plan
 
 1. Complete enumeration properly

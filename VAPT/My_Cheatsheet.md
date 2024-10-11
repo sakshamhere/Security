@@ -13,7 +13,7 @@
 - Scan specific subnet / IP range
     - `arp-scan <subnet>`
 
-**Host Discovery by Netdiscover**
+**Host Discovery by Netdiscover** 
 - `sudo netdiscover -r 192.168.204.0/24` 
 
 **Host Discovery by NMAP**
@@ -1188,7 +1188,6 @@ ssh -i id_rsa root@10.10.11.136
 ```
 ### [LINUX POST EXPLOIT ENUMERATION](#)
 
-
 ###### OS Enumeration
 
 - Kernel version and System architecture
@@ -1295,6 +1294,18 @@ ssh -i id_rsa root@10.10.11.136
     - `/etc/resolve.conf`
 
 ### [LINUX PRIVILEGE ESCALATION](#)
+
+###### PrivEsc Tools/Scripts
+
+> The first thing you should do is run one or more of these, save the output they give you and just read them. Try to find any obvious things sticking out and don't rush to try kernel exploits even if you see them suggested here. Kernel exploits, while effective, will frequently crash the system if they fail. 
+
+- [LinEnum.sh](https://github.com/rebootuser/LinEnum)
+
+- [unix-privesc-check](http://pentestmonkey.net/tools/audit/unix-privesc-check)
+
+- [Linux Exploit Suggestor](https://github.com/The-Z-Labs/linux-exploit-suggester)
+
+more - https://book.hacktricks.xyz/linux-hardening/privilege-escalation#linux-unix-privesc-tools
 
 ###### Kernel Exploits
 
