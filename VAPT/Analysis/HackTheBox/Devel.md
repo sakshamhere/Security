@@ -1,8 +1,10 @@
 
 > Recon
-
-* 21 - FTP - Microsoft ftpd
-
+```
+Port - 21
+Service - FTP
+Version - Microsoft ftpd
+```
 - Anonymous login allowed
 - PUT command allowed, checked by HELP command
 
