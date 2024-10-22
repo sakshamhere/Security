@@ -3,7 +3,7 @@ Priority
 
 One New Technique of exploiting vulnerability per day (check HACTIVITY)
 
-One HTB Analysis per day
+One HTB Analysis per day 
 
 Read one AD Pentest Blog per day
 
