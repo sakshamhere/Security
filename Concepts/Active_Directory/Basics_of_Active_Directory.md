@@ -1,3 +1,5 @@
+References
+https://www.hackthebox.com/blog/introduction-to-active-directory
 https://tryhackme.com/room/winadbasics
 
 > Active Directory Basics
@@ -19,6 +21,12 @@ https://tryhackme.com/room/winadbasics
 
 
 > 
+# Active Directory History
+
+LDAP, the foundation of AD, was first introduced in 1971.
+The first beta release of Active Directory was in 1997, but it was not integrated into the Windows operating system until Windows Server 2000 was released. Each subsequent release of Windows Server saw added functionality and improvements in administration.
+
+
 # Active Directory Basics
 
 ## Windows Domain 
@@ -46,17 +54,13 @@ Now What if your business suddenly grows and now has 157 computers and 320 diffe
 ## Domain Controller
 
 The server that runs the Active Directory Domain services is known as a `Domain Controller (DC).`
-
-1. `Hosts copy of AD Directory store`
-
-2. `Provides Authentication and Authorisation Services`
-
-3. `Replicates updates to other domain controllers in domain and forest`
-
-4. `Allows Administrative access to manage user accounts and network resources`
+- It Hosts copy of AD Directory store
+- It Provides Authentication and Authorisation Services
+- It Replicates updates to other domain controllers in domain and forest
+- Allows Administrative access to manage user accounts and network resources
 
 
-# Active Directory Domain Service (AD DS)
+## Active Directory Domain Service (AD DS)
 
 `AD DS` is the core of `Windows Domain`.
 
