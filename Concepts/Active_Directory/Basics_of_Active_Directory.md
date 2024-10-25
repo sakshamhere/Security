@@ -26,17 +26,12 @@ https://tryhackme.com/room/winadbasics
 Consider small business network with only 5 computers and 5 employees. In such a tiny network, you will probably be able to configure each computer separately without a problem.
 Now What if your business suddenly grows and now has 157 computers and 320 different users located across four different offices. In such case we use `Windows Domain`
 
-`Windows domain` is a group of users and computers under the administration of a given business.
-
-`Wndows domain` is used to centralise the administration of users and computers of Windows computer network in a single repository called `Active Directory (AD)`
-
-And The server that runs the these Active Directory services is known as a `Domain Controller (DC).`
-
-Key uses of `Windows Domain` :-
-
-- `Centralised identity management`: All users across the network can be configured from Active Directory with minimum effort.
-
-- `Managing security policies`: You can configure security policies directly from Active Directory and apply them to users and computers across the network as needed.
+- It is a group of users and computers under the administration of a given business.
+- It is used to centralise the administration of users and computers of Windows computer network in a single repository called `Active Directory (AD)`
+- The server that runs the these Active Directory services is known as a `Domain Controller (DC).`
+- Key uses of `Windows Domain` :-
+    - `Centralised identity management`: All users across the network can be configured from Active Directory with minimum effort.
+    - `Managing security policies`: You can configure security policies directly from Active Directory and apply them to users and computers across the network as needed.
 
 - Example:
 
@@ -46,7 +41,7 @@ Key uses of `Windows Domain` :-
 
     - Suppose you are logging into a machine uaing a username `THM\Administrator` then THM is the windows domain you are using.
 
-The code of `Windows Domain` is `Active Directory Domain Service (AD DS)`.
+
 
 ## Domain Controller
 
