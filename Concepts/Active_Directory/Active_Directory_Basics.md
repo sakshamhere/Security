@@ -278,7 +278,7 @@ However the difference here is, with LDAP authentication, the application `direc
 In this The application has a pair of AD credentials that it can use first to query LDAP and then verify the AD user's credentials.
 
 
-# `How it works`
+`How it works`
 
 LDAP authentication is accomplished through a bind operation, and it follows a client/server model. 
 
