@@ -1,9 +1,9 @@
 https://tryhackme.com/room/winadbasics
 
 > Active Directory Basics
-1. Windows Domain 
-2. Domain Controller
-3. Active Directory Domain Service
+1.Windows Domain 
+2.Domain Controller
+3.Active Directory Domain Service
     - Active Directory data Store Schema (AD DS Schema)
     - Active Directory Domain Service data Store (AD DS data store)
 4. Objets
