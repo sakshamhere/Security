@@ -248,8 +248,8 @@ Client/user will send TGS_REQ to KDC , its current TGT along with a Service Prin
 
 
 
-#### NetNTLM
+## NetNTLM
 
-#### LDAP
+## LDAP
 
 
