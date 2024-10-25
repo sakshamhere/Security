@@ -75,11 +75,9 @@ The server that runs the Active Directory Domain services is known as a `Domain 
 - `AD DS Data Store`, AD DS data store contains the database files and processes that store and manage directory information for users, services and applications.
     - It contains sensitive file `Ntds.dit` (contains `Password Hashes of users` in that domain)
 
-# *****************************************************************************************************
-
-### Security Principals (objects)
-
-#### User
+### Objects 
+#### Security Principals
+##### Users
 - For every user that joins Active Directory domain , a user object will be created. User objects which are also known as `security principals`.
 
 - These `Users / Security Principals` can be authenticated by the domain and can be assigned privileges over resources like files or printers.
@@ -91,7 +89,7 @@ The server that runs the Active Directory Domain services is known as a `Domain 
     - `Service`: we can also define users to be used by services like IIS or MSSQL, these `service users` are different from regular users as they will only have the privileges needed to run their specific service.
 
 
-#### Machine 
+##### Machines 
 
 - For every computer that joins the Active Directory domain, a machine object will be created. Machines are also considered as `security principals`.
 
@@ -104,7 +102,7 @@ The server that runs the Active Directory Domain services is known as a `Domain 
 - Identifying machine accounts is relatively easy. They follow a specific naming scheme. The machine account name is the computer's name followed by a dollar sign. `For example, a machine named `DC01 `will have a machine account called `DC01$``.
 
 
-#### Security Groups 
+##### Security Groups 
 
 - Security Groups basically provides privileges , these are to assign access rights to files or other resources to a group of `Users or Machines`.
 Security Groups are also considered as `Security Principals`.
@@ -134,40 +132,92 @@ Security Groups are also considered as `Security Principals`.
     - `Domain Controllers`
         - Includes all existing DCs on the domain.
 
+- All these objects (Users, Machines and groups) in domain are organised in `Organizational Units`
 
-All these objects (Users, Machines and groups) in domain are organised in `Organizational Units`
+
+#### Container Objects
+##### OUs (Organizational Units)
+- All these objects (Users, Machines and groups) in domain are organised in `Organizational Units` which are `container objects` that allow you to classify users and machines.
+
+- OUs are mainly used to define sets of users with similar policing requirements.
+
+- For example The people in the Sales department of your organisation are likely to have a different set of policies applied than the people in IT.
+
+- Note that a user can only be a part of a single OU at a time.
+
+- OUs can have multiple child OUs
+
+- There are some `Default OUs` / Containers created by Windows automatically as mentioned below:
+
+    - `Builtin:` 
+        - Contains default groups available to any Windows host.
+
+    - `Computers: `
+        - Any machine joining the network will be put here by default. You can move them if needed.
+
+    - `Domain Controllers:` 
+        - Default OU that contains the DCs in your network.
+
+    - `Users:` 
+        - Default users and groups that apply to a domain-wide context.
+
+    - `Managed Service Accounts:` 
+        - Holds accounts used by services in your Windows domain.
+
+#### Group Policy Objects (GPO)
+
+- So far, we have organised users and computers in OUs just for the sake of it, but the main idea behind this is to be able to deploy different policies for each OU individually. That way, we can push different configurations and security baselines to users depending on their department.
+
+- Windows manages such policies through `Group Policy Objects (GPO)`. GPOs are simply a `collection of settings that can be applied to OUs`
+- To configure GPOs, you can use the `Group Policy Management tool`, available from the start menu:
+
+- `GPO Distribution` - GPOs are distributed to the network via a `network share` called `SYSVOL`, which is stored in the DC.
+
+- The `SYSVOL` share points by default to the `C:\Windows\SYSVOL\sysvol\` directory on each of the DCs in our network.
+
+- All users in a domain should typically have access to this share over the network to sync their GPOs periodically.
+
+### Multiple Domains
+
+Having a single `Windows domain` for a company is good enough to start, but in time some additional needs might push you into having more than one.
+For Example suddenly your company expands to a new country. The new country has different laws and regulations that require you to update your `GPOs` to comply.While you could create a complex `OU` structure and use `delegations` to achieve this, but having a huge AD structure might be hard to manage and prone to human errors.
+
+Luckily for us, `Active Directory supports integrating multiple domains` so that you can partition your network into units that can be managed independently.
+
+#### Trees
+Domains can be joined into a Tree.
+
+                                                                     DC-Root
+                                                                   (thm.local)
+                                                                  /           \
+                                                                 /             \
+                                                                /               \
+                                                        DC-UK                       DC-US
+                                                    (uk.thm.local)                  (us.thm.local)
+    
+
+The IT people from the UK will have their own DC that manages the UK resources only, For example, a UK user would not be able to manage US users. In that way, the Domain Administrators of each branch will have complete control over their respective DCs, but not other branches' DCs
 
 
-# Organizational Units (Container Objects)
+#### Forests
 
-All these objects (Users, Machines and groups) in domain are organised in `Organizational Units` which are `container objects` that allow you to classify users and machines.
+Suppose your company continues growing and eventually acquires another company called `MHT Inc`. 
 
-OUs are mainly used to define sets of users with similar policing requirements.
+When both companies merge, you will probably have different domain trees for each company, each managed by its own IT department. The union of several trees with different namespaces into the same network is known as a forest.
 
-For example The people in the Sales department of your organisation are likely to have a different set of policies applied than the people in IT.
+                                         DC-Root  <<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>> DC-Root
+                                       (thm.local)                                                (mht.local)
+                                      /           \                                               /         \  
+                                     /             \                                             /           \
+                                    /               \                                           /             \
+                        DC-UK                       DC-US                               DC-Europe              DC- Asia
+                    (uk.thm.local)                  (us.thm.local)                    (eu.mht.local)           (asia.mht.local)
 
-Note that a user can only be a part of a single OU at a time.
 
-OUs can have multiple child OUs
+#### Trust Relationships
 
-There are some `Default OUs` / Containers created by Windows automatically as mentioned below:
+At a certain point, a user at THM UK might need to access a shared file in one of MHT ASIA servers. For this to happen, domains arranged in trees and forests are joined together by trust relationships.
 
-- `Builtin:` 
-    - Contains default groups available to any Windows host.
-
-- `Computers: `
-    - Any machine joining the network will be put here by default. You can move them if needed.
-
-- `Domain Controllers:` 
-    - Default OU that contains the DCs in your network.
-
-- `Users:` 
-    - Default users and groups that apply to a domain-wide context.
-
-- `Managed Service Accounts:` 
-    - Holds accounts used by services in your Windows domain.
-
-# *****************************************************************************************************
 
 # Security Groups vs OUs
 
@@ -183,22 +233,7 @@ why we have both Security groups and OUs. While both are used to classify users 
 
 One of the nice things you can do in AD is to give specific users some control over some OUs. This process is known as `delegation` and allows you to grant users specific privileges to perform advanced tasks on OUs without needing a Domain Administrator to step in.
 
-# ******************************************************************************************************
 
-# `Group Policy` Objects (GPO)
-
-So far, we have organised users and computers in OUs just for the sake of it, but the main idea behind this is to be able to deploy different policies for each OU individually. That way, we can push different configurations and security baselines to users depending on their department.
-
-Windows manages such policies through `Group Policy Objects (GPO)`. GPOs are simply a `collection of settings that can be applied to OUs`
-To configure GPOs, you can use the `Group Policy Management tool`, available from the start menu:
-
-`GPO Distribution` - GPOs are distributed to the network via a `network share` called `SYSVOL`, which is stored in the DC.
-
-The `SYSVOL` share points by default to the `C:\Windows\SYSVOL\sysvol\` directory on each of the DCs in our network.
-
-All users in a domain should typically have access to this share over the network to sync their GPOs periodically.
-
-*************************************************************<<<<<<<<<>>>>>>>>>**************************************************************
 
 # Authentication Methods
 
@@ -214,44 +249,3 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 
 # ************************************************************************************************
 
-# Trees, Forest and Trust Relationships (Multiple Domains)
-
-Having a single `Windows domain` for a company is good enough to start, but in time some additional needs might push you into having more than one.
-
-For Example suddenly your company expands to a new country. The new country has different laws and regulations that require you to update your `GPOs` to comply.While you could create a complex `OU` structure and use `delegations` to achieve this, but having a huge AD structure might be hard to manage and prone to human errors.
-
-Luckily for us, `Active Directory supports integrating multiple domains` so that you can partition your network into units that can be managed independently.
-
-# `Trees`
-Domains can be joined into a Tree.
-
-                                                                     DC-Root
-                                                                   (thm.local)
-                                                                  /           \
-                                                                 /             \
-                                                                /               \
-                                                        DC-UK                       DC-US
-                                                    (uk.thm.local)                  (us.thm.local)
-    
-
-The IT people from the UK will have their own DC that manages the UK resources only, For example, a UK user would not be able to manage US users. In that way, the Domain Administrators of each branch will have complete control over their respective DCs, but not other branches' DCs
-
-
-# `Forests`
-
-Suppose your company continues growing and eventually acquires another company called `MHT Inc`. 
-
-When both companies merge, you will probably have different domain trees for each company, each managed by its own IT department. The union of several trees with different namespaces into the same network is known as a forest.
-
-                                         DC-Root  <<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>> DC-Root
-                                       (thm.local)                                                (mht.local)
-                                      /           \                                               /         \  
-                                     /             \                                             /           \
-                                    /               \                                           /             \
-                        DC-UK                       DC-US                               DC-Europe              DC- Asia
-                    (uk.thm.local)                  (us.thm.local)                    (eu.mht.local)           (asia.mht.local)
-
-
-# `Trust Relationships`
-
-At a certain point, a user at THM UK might need to access a shared file in one of MHT ASIA servers. For this to happen, domains arranged in trees and forests are joined together by trust relationships.
