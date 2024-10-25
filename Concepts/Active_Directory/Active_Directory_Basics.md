@@ -216,6 +216,18 @@ One of the nice things you can do in AD is to give specific users some control o
 
 
 # Active Directory Authentication Methods
+https://www.youtube.com/watch?v=OuJe0d1NGaM
+
+```
+
+USER                                      KDC                                         SERVICE
+                                    [ [AS]  [TGS] ]
+
+
+
+
+
+```
 
 When using `Windows domains`, all credentials are stored in the `Domain Controllers`. 
 Whenever a user tries to authenticate to a service using domain credentials, the service will need to ask the Domain Controller to verify if they are correct. 
@@ -224,11 +236,13 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 1. `Kerberos`: `Kerberos authentication `is the default authentication protocol for any recent version of Windows.
 2. `NetNTLM`: Legacy authentication protocol kept for compatibility purposes.
 
-#### Kerberos Authentication 
+## Kerberos Authentication 
 
+### Key Components in Authentication
+
+####
 
 `Kerberos authentication` is the default authentication protocol for any recent version of Windows.
-
 Users authenticated via kerberos are assigned Tickets, they can provide present these tickets to services as a proof of being authenticated.
 
 When Kerberos is used for authentication, the following process happens:
