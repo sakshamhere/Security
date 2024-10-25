@@ -1,26 +1,7 @@
-References
 https://www.hackthebox.com/blog/introduction-to-active-directory
 https://tryhackme.com/room/winadbasics
 
-> Active Directory Basics
-- Windows Domain 
-- Domain Controller
-- Active Directory Domain Service
-    - Active Directory data Store Schema (AD DS Schema)
-    - Active Directory Domain Service data Store (AD DS data store)
-- Objets
-    - User
-    - Machines
-    - Security Groups
-    - Organisational Units  (Container objects)
-    - Group Policy Object
 
-5. Authentication Methods
-6. Trees, Forest and Trust Relationships (Multiple Domains)
-
-
-
-> 
 # Active Directory Basics
 
 ## Active Directory History
@@ -164,6 +145,15 @@ Security Groups are also considered as `Security Principals`.
     - `Managed Service Accounts:` 
         - Holds accounts used by services in your Windows domain.
 
+###### Security Groups vs OUs
+
+why we have both Security groups and OUs. While both are used to classify users and computers?
+
+- Organisational Units: OUs are `handy for applying policies to users and computers, which include specific configurations that pertain to sets of users depending on their particular role in the enterprise`. Remember, `a user can only be a member of a single OU at a time`, as it wouldn't make sense to try to apply two different sets of policies to a single user.
+
+- Security Groups, on the other hand, `are used to grant permissions over resources`. For example, you will use groups if you want to allow some users to access a shared folder or network printer. `A user can be a part of many groups`, which is needed to grant access to multiple resources.
+
+
 #### Group Policy Objects (GPO)
 
 - So far, we have organised users and computers in OUs just for the sake of it, but the main idea behind this is to be able to deploy different policies for each OU individually. That way, we can push different configurations and security baselines to users depending on their department.
@@ -219,15 +209,6 @@ When both companies merge, you will probably have different domain trees for eac
 At a certain point, a user at THM UK might need to access a shared file in one of MHT ASIA servers. For this to happen, domains arranged in trees and forests are joined together by trust relationships.
 
 
-# Security Groups vs OUs
-
-why we have both Security groups and OUs. While both are used to classify users and computers?
-
-- Organisational Units: OUs are `handy for applying policies to users and computers, which include specific configurations that pertain to sets of users depending on their particular role in the enterprise`. Remember, `a user can only be a member of a single OU at a time`, as it wouldn't make sense to try to apply two different sets of policies to a single user.
-
-- Security Groups, on the other hand, `are used to grant permissions over resources`. For example, you will use groups if you want to allow some users to access a shared folder or network printer. `A user can be a part of many groups`, which is needed to grant access to multiple resources.
-
-
 ### Delegations
 
 One of the nice things you can do in AD is to give specific users some control over some OUs. This process is known as `delegation` and allows you to grant users specific privileges to perform advanced tasks on OUs without needing a Domain Administrator to step in.
@@ -250,11 +231,4 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 
 
 
-###### Security Groups vs OUs
-
-why we have both Security groups and OUs. While both are used to classify users and computers?
-
-- Organisational Units: OUs are `handy for applying policies to users and computers, which include specific configurations that pertain to sets of users depending on their particular role in the enterprise`. Remember, `a user can only be a member of a single OU at a time`, as it wouldn't make sense to try to apply two different sets of policies to a single user.
-
-- Security Groups, on the other hand, `are used to grant permissions over resources`. For example, you will use groups if you want to allow some users to access a shared folder or network printer. `A user can be a part of many groups`, which is needed to grant access to multiple resources.
 
