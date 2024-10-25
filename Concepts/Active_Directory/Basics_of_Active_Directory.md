@@ -227,25 +227,34 @@ why we have both Security groups and OUs. While both are used to classify users 
 
 - Security Groups, on the other hand, `are used to grant permissions over resources`. For example, you will use groups if you want to allow some users to access a shared folder or network printer. `A user can be a part of many groups`, which is needed to grant access to multiple resources.
 
-# *****************************************************************************************************
 
-# Delegation
+### Delegations
 
 One of the nice things you can do in AD is to give specific users some control over some OUs. This process is known as `delegation` and allows you to grant users specific privileges to perform advanced tasks on OUs without needing a Domain Administrator to step in.
 
 
 
-# Authentication Methods
+### Authentication Methods
 
 When using `Windows domains`, all credentials are stored in the `Domain Controllers`. 
-
 Whenever a user tries to authenticate to a service using domain credentials, the service will need to ask the Domain Controller to verify if they are correct. 
 
 2 protocols can be used for network authentication in windows domains:
-
 1. `Kerberos`: `Kerberos authentication `is the default authentication protocol for any recent version of Windows.
-
 2. `NetNTLM`: Legacy authentication protocol kept for compatibility purposes.
 
-# ************************************************************************************************
+#### Kerberos authentication 
+1. `Kerberos`: `Kerberos authentication `is the default authentication protocol for any recent version of Windows.
+
+#### NetNTLM
+
+
+
+###### Security Groups vs OUs
+
+why we have both Security groups and OUs. While both are used to classify users and computers?
+
+- Organisational Units: OUs are `handy for applying policies to users and computers, which include specific configurations that pertain to sets of users depending on their particular role in the enterprise`. Remember, `a user can only be a member of a single OU at a time`, as it wouldn't make sense to try to apply two different sets of policies to a single user.
+
+- Security Groups, on the other hand, `are used to grant permissions over resources`. For example, you will use groups if you want to allow some users to access a shared folder or network printer. `A user can be a part of many groups`, which is needed to grant access to multiple resources.
 
