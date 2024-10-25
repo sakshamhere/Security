@@ -21,15 +21,19 @@ https://tryhackme.com/room/winadbasics
 
 
 > 
-# Active Directory History
-
-LDAP, the foundation of AD, was first introduced in 1971.
-The first beta release of Active Directory was in 1997, but it was not integrated into the Windows operating system until Windows Server 2000 was released. Each subsequent release of Windows Server saw added functionality and improvements in administration.
-
-
 # Active Directory Basics
 
-## Windows Domain 
+## Active Directory History
+
+- LDAP, the foundation of AD, was first introduced in 1971.
+- The first beta release of Active Directory was in 1997, but it was not integrated into the Windows operating system until Windows Server 2000 was released. Each subsequent release of Windows Server saw added functionality and improvements in administration.
+- Windows Server 2003 introduced the `Forest` feature, which gave sysadmins the ability to create "containers," or groupings, of separate domains, users, computers, groups, and other objects.
+- Server 2008 saw the debut of `Active Directory Federation Services (ADFS)`, which provides Single Sign-On (SSO) to systems and applications for users using Windows Server operating systems. ADFS streamlined the process of signing into applications and systems on a different LAN, allowing them to access organizations across organizational boundaries with a single set of credentials. 
+- Server 2016 brought even more changes to AD, including `functionality for migrating AD environments to the cloud` and further security enhancements such as user access monitoring and Group Managed Service Accounts (gMSA). Group Managed Service Accounts offer a more secure way to run automated tasks, applications, and services. By design, they use very complex passwords, automatically rotate on a set interval (like machine accounts), and are a key mitigation against the infamous Kerberoasting attack. This release also brought a more significant push toward the cloud with the inclusion of Azure AD Connect as an SSO method for users being migrated to Microsoft Office 365.
+
+# Key Components
+
+### Windows Domain 
 
 Consider small business network with only 5 computers and 5 employees. In such a tiny network, you will probably be able to configure each computer separately without a problem.
 Now What if your business suddenly grows and now has 157 computers and 320 different users located across four different offices. In such case we use `Windows Domain`
