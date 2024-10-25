@@ -221,7 +221,7 @@ https://www.youtube.com/watch?v=OuJe0d1NGaM
 When the user/service principal first logs in to the workstation, Its first and only interaction with kerberos takes place, It is when user auhenticates to kerberos by providing its identity ie credentials.
 Note that this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal
 
-![alt text](https://en.wikipedia.org/wiki/Kerberos_(protocol)#/media/File:Kerberos_protocol.svg)
+![alt text](https://upload.wikimedia.org/wikipedia/commons/6/68/Kerberos_protocol.svg)
 ```
 
 USER                                        KDC                                         SERVICE
