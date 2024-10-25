@@ -226,22 +226,20 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 
 ## Kerberos Authentication 
 https://www.youtube.com/watch?v=OuJe0d1NGaM
-https://syfuhs.net/a-bit-about-kerberos
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/b4af186e-b2ff-43f9-b18e-eedb366abf13
 
 Okay, so we have our three parties: The client (user/human), the application / service (say SMB share), and the trusted third party (KDC) and this user (service principal) wants to access the SMB share service.
 
-1. First when user logs in workstation it authenticates to KDC, it provides credentials and expects a ticket in exchange.
+1. First when user logs in workstation it authenticates to KDC's Authentication Service (AS), it provides credentials and expects a ticket in exchange.
 
-```
+Client/user sends AS_REQ to KDC, it presents its principal name and pre-authentication details, The AS will then verify user and if its legitimate user it will respond back with a Ticket Granting Ticket (TGT) with a session key, this is AS_REP. The user can use this TGT and sesion key to have an encrypted communication further with KDC, this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal.
 
-USER                                        KDC                                         SERVICE
-                                        [ [AS]  [TGS] ]
+2. Now if client/user wants to access any service (Say SMB share), he will now request to KDC's Ticket Granting Service(TGS) to provide a Service Ticket for the service.
 
+Client/user will send TGS_REQ to KDC , its current TGT along with a Service Prinicipal Name (SPN) of service for which it wants service ticket. The KDC's TGS will validate TGT presented and if everything is fine it will response TGS_REP with the service tciket and a session key, the client can then use this service ticket and sesion key to connect with the Service for which it requested service ticket.
 
+3. Now client/user can present the service ticket and session key to the service/server it wants to access. The service/server will decrypt the ticket and validate it. If thins are fine then it grants the access.
 
-
-
-```
 
 ![alt text](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/ms-kile_files/image001.png)
 
