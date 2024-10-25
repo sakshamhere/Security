@@ -224,7 +224,7 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 1. `Kerberos`: `Kerberos authentication `is the default authentication protocol for any recent version of Windows.
 2. `NetNTLM`: Legacy authentication protocol kept for compatibility purposes.
 
-## Kerberos Authentication 
+## Kerberos Authentication (KRTGT)
 https://www.youtube.com/watch?v=OuJe0d1NGaM
 https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/b4af186e-b2ff-43f9-b18e-eedb366abf13
 
@@ -244,11 +244,30 @@ Client/user will send TGS_REQ to KDC , its current TGT along with a Service Prin
 ![alt text](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/ms-kile_files/image001.png)
 
 
+### KRTGT vs NetNTLM
+With NTLM authentication, the hashed user password is stored on the client, the DC, and the application server, and an application server would have to coordinate directly with the DC to validate access. It’s everywhere and someone with a tool like `mimikatz` could certainly grab that password from any of those locations and make hay.
 
+With KRBTGT, the hash isn’t stored in memory across as many systems, making the theft of a KRBTGT password much more difficult.
 
+To have full unfettered access, a user would have to gain access to the KDC on the DC and steal the password to create a Golden Ticket
 
+### Forced NTLM (IP vs Hostnames)
+Question: `Is there a difference between `dir \\za.tryhackme.com\SYSVOL` and `dir \\<DC IP>\SYSVOL` and why the big fuss about DNS?`
 
-## NetNTLM
+There is quite a difference, and it boils down to the authentication method being used. 
+
+When we provide the hostname (FQDN), network authentication will attempt first to perform Kerberos authentication. Since Kerberos authentication relies on fully qualified domain names (FQDN), because the FQDN of the service is referenced directly in the ticket. 
+
+In Active Directory environments where Kerberos authentication uses hostnames/FQDN embedded in the tickets, if we provide the IP instead, we can force the authentication type to be NTLM. 
+
+NTLM is so heavily integrated into Microsoft products that in most cases it's going to be running side-by-side with Kerberos.
+
+While on the surface, this does not matter to us right now, it is good to understand these slight differences since they can allow you to remain more stealthy during a Red team assessment. 
+
+In some instances, organisations will be monitoring for OverPass- and Pass-The-Hash Attacks. 
+
+Forcing NTLM authentication is a good trick to have in the book to avoid detection in these cases.
+
 
 ## LDAP
 
