@@ -31,7 +31,7 @@ https://tryhackme.com/room/winadbasics
 - Server 2008 saw the debut of `Active Directory Federation Services (ADFS)`, which provides Single Sign-On (SSO) to systems and applications for users using Windows Server operating systems. ADFS streamlined the process of signing into applications and systems on a different LAN, allowing them to access organizations across organizational boundaries with a single set of credentials. 
 - Server 2016 brought even more changes to AD, including `functionality for migrating AD environments to the cloud` and further security enhancements such as user access monitoring and Group Managed Service Accounts (gMSA). Group Managed Service Accounts offer a more secure way to run automated tasks, applications, and services. By design, they use very complex passwords, automatically rotate on a set interval (like machine accounts), and are a key mitigation against the infamous Kerberoasting attack. This release also brought a more significant push toward the cloud with the inclusion of Azure AD Connect as an SSO method for users being migrated to Microsoft Office 365.
 
-# Key Components
+## Key Components
 
 ### Windows Domain 
 
@@ -53,9 +53,7 @@ Now What if your business suddenly grows and now has 157 computers and 320 diffe
 
     - Suppose you are logging into a machine uaing a username `THM\Administrator` then THM is the windows domain you are using.
 
-
-
-## Domain Controller
+### Domain Controller
 
 The server that runs the Active Directory Domain services is known as a `Domain Controller (DC).`
 - It Hosts copy of AD Directory store
@@ -64,35 +62,27 @@ The server that runs the Active Directory Domain services is known as a `Domain 
 - Allows Administrative access to manage user accounts and network resources
 
 
-## Active Directory Domain Service (AD DS)
+### Active Directory Domain Service (AD DS), Schema and Data Store
 
-`AD DS` is the core of `Windows Domain`.
+- `AD DS` is the core of Windows Domain. This service acts as a catalogue that holds the information of all of the "objects"(`users, groups, machines, printers, shares and many others`) that exist on your network.
 
-This service acts as a catalogue that holds the information of all of the "objects"(`users, groups, machines, printers, shares and many others`) that exist on your network.
+- `AD DS Schema`, AD DS Schema is basically a blueprint of every object that can be created in AD
 
-# `AD DS Schema`
+    - It defines every type of object that can be stored in the directory
 
-AD DS Schema is basically a blueprint of every object that can be created in AD
+    - It Enforces rules regarding object creation and configuration
 
-- It defines every type of object that can be stored in the directory
-
-- It Enforces rules regarding object creation and configuration
-
-# `AD DS Data Store`
-
-AD DS data store contains the database files and processes that store and manage directory information for users, services and applications.
-
-- It contains sensitive file `Ntds.dit` (contains `Password Hashes of users` in that domain)
+- `AD DS Data Store`, AD DS data store contains the database files and processes that store and manage directory information for users, services and applications.
+    - It contains sensitive file `Ntds.dit` (contains `Password Hashes of users` in that domain)
 
 # *****************************************************************************************************
 
-# `Common Objects (Users, Machines and Security Groups)`
+### Security Principals (objects)
 
-# 1. `Users` 
+#### User
+- For every user that joins Active Directory domain , a user object will be created. User objects which are also known as `security principals`.
 
-For every user that joins Active Directory domain , a user object will be created. User objects which are also known as `security principals`.
-
-These `Users / Security Principals` can be authenticated by the domain and can be assigned privileges over resources like files or printers.
+- These `Users / Security Principals` can be authenticated by the domain and can be assigned privileges over resources like files or printers.
 
 - Users can be used to represent two types of entities (`People user and Service user`):
 
@@ -101,58 +91,54 @@ These `Users / Security Principals` can be authenticated by the domain and can b
     - `Service`: we can also define users to be used by services like IIS or MSSQL, these `service users` are different from regular users as they will only have the privileges needed to run their specific service.
 
 
-# 2. `Machines`
+#### Machine 
 
-For every computer that joins the Active Directory domain, a machine object will be created. Machines are also considered as `security principals`.
+- For every computer that joins the Active Directory domain, a machine object will be created. Machines are also considered as `security principals`.
 
-These `machine objects ` are assigned an `Machine Account` just as any regular user. This `Machine Account` has somewhat limited rights within the domain itself.
+- These `machine objects ` are assigned an `Machine Account` just as any regular user. This `Machine Account` has somewhat limited rights within the domain itself.
 
-These `Machine Account` are local administrators on the assigned computer, they are generally not supposed to be accessed by anyone except the computer itself, but as with any other account, if you have the password, you can use it to log in.
+- These `Machine Account` are local administrators on the assigned computer, they are generally not supposed to be accessed by anyone except the computer itself, but as with any other account, if you have the password, you can use it to log in.
 
-> Note: Machine Account passwords are automatically rotated out and are generally comprised of 120 random characters
+- Machine Account passwords are automatically rotated out and are generally comprised of 120 random characters
 
-`Identifying a Machine Account`
-
-Identifying machine accounts is relatively easy. They follow a specific naming scheme. The machine account name is the computer's name followed by a dollar sign. `For example, a machine named `DC01 `will have a machine account called `DC01$``.
+- Identifying machine accounts is relatively easy. They follow a specific naming scheme. The machine account name is the computer's name followed by a dollar sign. `For example, a machine named `DC01 `will have a machine account called `DC01$``.
 
 
-# 3. `Security Groups`
+#### Security Groups 
 
-Security Groups basically provides privileges , these are to assign access rights to files or other resources to a group of `Users or Machines`.
+- Security Groups basically provides privileges , these are to assign access rights to files or other resources to a group of `Users or Machines`.
 Security Groups are also considered as `Security Principals`.
 
-Groups can have both users and machines as members.
+- Groups can have both users and machines as members.
 
-There are many groups created by default in a `Windows Domain` Some of the most `Privileged important groups` in a Domain are :-
+- There are many groups created by default in a `Windows Domain` Some of the most `Privileged important groups` in a Domain are :-
 
-- `Domain Admins` 
-    - Users of this group have `administrative privileges for the entire domain`. By default, they can administer any computer on the domain, including the DCs.
+    - `Domain Admins` 
+        - Users of this group have `administrative privileges for the entire domain`. By default, they can administer any computer on the domain, including the DCs.
 
-- `Server Operators`
-    - Users in this group have `administrative privileges for Domain Controllers`. They cannot change any administrative group memberships.
+    - `Server Operators`
+        - Users in this group have `administrative privileges for Domain Controllers`. They cannot change any administrative group memberships.
 
-- `Backup Operators`	
-    - Users in this group are allowed to `access any file in Domain`, ignoring their permissions. They are used to perform backups of data on computers.
+    - `Backup Operators`	
+        - Users in this group are allowed to `access any file in Domain`, ignoring their permissions. They are used to perform backups of data on computers.
 
-- `Account Operators`
-    - Users in this group can `create or modify other accounts in the domain`.
+    - `Account Operators`
+        - Users in this group can `create or modify other accounts in the domain`.
 
-- `Domain Users`
-    - Includes all existing user accounts in the domain.
+    - `Domain Users`
+        - Includes all existing user accounts in the domain.
 
-- `Domain Computers`
-    - Includes all existing computers in the domain.
+    - `Domain Computers`
+        - Includes all existing computers in the domain.
 
-- `Domain Controllers`
-    - Includes all existing DCs on the domain.
+    - `Domain Controllers`
+        - Includes all existing DCs on the domain.
 
-To configure users, groups or machines in Active Directory, we need to `log in to the Domain Controller` and run `"Active Directory Users and Computers"` from the start menu.
 
 All these objects (Users, Machines and groups) in domain are organised in `Organizational Units`
 
-# *************************************************************************************************
 
-# `Organizational Units` or Container Objects
+# Organizational Units (Container Objects)
 
 All these objects (Users, Machines and groups) in domain are organised in `Organizational Units` which are `container objects` that allow you to classify users and machines.
 
