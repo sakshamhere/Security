@@ -216,22 +216,6 @@ One of the nice things you can do in AD is to give specific users some control o
 
 
 # Active Directory Authentication Methods
-https://www.youtube.com/watch?v=OuJe0d1NGaM
-
-When the user/service principal first logs in to the workstation, Its first and only interaction with kerberos takes place, It is when user auhenticates to kerberos by providing its identity ie credentials.
-Note that this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal
-
-![alt text](https://upload.wikimedia.org/wikipedia/commons/6/68/Kerberos_protocol.svg)
-```
-
-USER                                        KDC                                         SERVICE
-                                        [ [AS]  [TGS] ]
-
-1. Request for TGS
-
-
-
-```
 
 When using `Windows domains`, all credentials are stored in the `Domain Controllers`. 
 Whenever a user tries to authenticate to a service using domain credentials, the service will need to ask the Domain Controller to verify if they are correct. 
@@ -241,6 +225,30 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 2. `NetNTLM`: Legacy authentication protocol kept for compatibility purposes.
 
 ## Kerberos Authentication 
+https://www.youtube.com/watch?v=OuJe0d1NGaM
+https://syfuhs.net/a-bit-about-kerberos
+
+Okay, so we have our three parties: The client (user/human), the application / service (say SMB share), and the trusted third party (KDC) and this user (service principal) wants to access the SMB share service.
+
+1. First when user logs in workstation it authenticates to KDC, it provides credentials and expects a ticket in exchange.
+
+```
+
+USER                                        KDC                                         SERVICE
+                                        [ [AS]  [TGS] ]
+
+
+
+
+
+```
+
+![alt text](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/ms-kile_files/image001.png)
+
+When the user (service principal) user auhenticates to kerberos by providing its identity ie credentials.
+Note that this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal
+
+
 
 ### Key Components in Authentication
 
