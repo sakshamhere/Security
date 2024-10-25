@@ -1,6 +1,6 @@
 https://tryhackme.com/room/winadbasics
 
-
+> Active Directory Basics
 1. Windows Domain 
 2. Domain Controller
 3. Active Directory Domain Service
@@ -16,11 +16,14 @@ https://tryhackme.com/room/winadbasics
 5. Authentication Methods
 6. Trees, Forest and Trust Relationships (Multiple Domains)
 
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# Windows Domain 
+
+
+> 
+# Active Directory Basics
+
+## Windows Domain 
 
 Consider small business network with only 5 computers and 5 employees. In such a tiny network, you will probably be able to configure each computer separately without a problem.
-
 Now What if your business suddenly grows and now has 157 computers and 320 different users located across four different offices. In such case we use `Windows Domain`
 
 `Windows domain` is a group of users and computers under the administration of a given business.
@@ -45,9 +48,7 @@ Key uses of `Windows Domain` :-
 
 The code of `Windows Domain` is `Active Directory Domain Service (AD DS)`.
 
-# ***********************************************************************************************************************************************************
-
-# Domain Controller
+## Domain Controller
 
 The server that runs the Active Directory Domain services is known as a `Domain Controller (DC).`
 
@@ -59,7 +60,6 @@ The server that runs the Active Directory Domain services is known as a `Domain 
 
 4. `Allows Administrative access to manage user accounts and network resources`
 
-# ***********************************************************************************************************************************************************
 
 # Active Directory Domain Service (AD DS)
 
