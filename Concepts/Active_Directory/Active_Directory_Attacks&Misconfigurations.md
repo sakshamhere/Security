@@ -4,7 +4,7 @@ https://www.hackthebox.com/blog/8-powerful-kerberos-attacks
 https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_lyre_of_orpheus_is_kerberos_really_bulletproof_
 https://www.prosec-networks.com/en/blog/kerberos-attacks/
 https://www.thehacker.recipes/ad/movement/kerberos/pre-auth-bruteforce
-
+https://www.cybertriage.com/blog/dfir-breakdown-kerberoasting/
 ## Username Enumeration
 ###### (preauth burteforced)
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
@@ -20,10 +20,15 @@ Present/Enabled	KDC_ERR_PREAUTH_REQUIRED    Additional preauthentication require
 Locked/Disabled	KDC_ERR_CLIENT_REVOKED      The client's credentials have been revoked
 Does not exist	KDC_ERR_C_PRINCIPAL_UNKNOWN Client not found in Kerberos database
 ```
-Tools - This can be done easily using tools like `Kerbrute`
+
+Tools like `kerbrute` (Go) and `smartbrute` (Python) can be used to bruteforce credentials through the Kerberos pre-authentication. The smartbrute utility can be used in a brute mode (standard bruteforcing features) or in a smart mode (requires prior knowledge of a low-priv user credentials, but operates LDAP enumeration and avoid locking out accounts, fetches the users list and so on).
+
 
 ![alt text](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWIeARP6j9o46YNN1siF9A_lpyfcw1RTrNp2tiVBlxgPM68QpWa1wag2eQkAuUBZ7HjWwptspLbeMaRJ7vwkygwU4sAYRv8NPXovgQMOhuoXOcnByVrSUp85uM2k_a4YZSgE-xn_q8KtXOPRL7jGrZ6ZVSsGEzkobKFLYf3X9ey0cu43ceeHLAoRlMVg/s16000/4.png)
 
+Remediation
+
+The Kerberos user enumeration can be difficult to troubleshoot because it depends on good Kerberos monitoring. This monitoring must be able to detect unrealistic amounts of AS-REQ requests without follow-up requests.
 
 ## AS-REP Roasting 
 ###### (preauthentication disabled)
@@ -50,5 +55,23 @@ NOTE:
 - If we dont have domain user access/intial foothold then there is no way to find users disabled for pre-auth, we can only guess credentials.
 - If we already have domain user/intial foothold then we can use an LDAP query to find users in the domain without Kerberos pre-authentication.
 
+## Kerberosting
+###### 
 
+In Kerberos auth user asks for a (service ticket) ST from KDC, for this user needs to present a valid TGT (Ticket Granting Ticket) along with SPN (Service Principal Name) of the service it want to access.
 
+The ST is encrypted with the requested service account's NT hash. If an attacker has a valid TGT and knows a service (SPN), he can request a ST for this service and crack it offline later in an attempt to retrieve that service account's password. This is Kerberosing.
+
+This requires an attacker to have access to a domain account prior to performing any Kerberoasting activity.
+
+Kerberosting can only be perfomed for accounts that have SPN, only for these account service ticket is encrypted with password hash. These are often computer accounts and service accounts that are associated with a service like MS SQL. However, normal user accounts can have a SPN as well. These are the core targets of a Kerberoasting attack.
+
+Attacker can query to find all such account ie kerberostable account, using Kerberoasting tools out there like `Rubeus`, `Invoke-Kerberoast`, and Impackets `GetUsersSPNs.py`.
+
+NOTE:
+
+Kerberosting is useless for machine accuonts and service accounts,  due to the strong password management on such accounts. Computer account passwords are updated every 30 days, by default, and contain a 120 unicode character password. Similarly, managed service accounts have passwords that are managed by AD and have similar password age and length requirements that computer accounts have.
+
+Kerberosting focus on user accounts with atleast one SPN , specially admin accounts, since they probably have human-defined passwords.
+
+Once hash is obtained, Hashcat and JohnTheRipper can then be used to try cracking the hash
