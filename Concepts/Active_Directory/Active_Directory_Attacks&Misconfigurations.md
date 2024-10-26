@@ -56,7 +56,7 @@ NOTE:
 - If we already have domain user/intial foothold then we can use an LDAP query to find users in the domain without Kerberos pre-authentication.
 
 ## Kerberosting
-###### 
+###### (user accounts with SPN)
 
 In Kerberos auth user asks for a (service ticket) ST from KDC, for this user needs to present a valid TGT (Ticket Granting Ticket) along with SPN (Service Principal Name) of the service it want to access.
 
