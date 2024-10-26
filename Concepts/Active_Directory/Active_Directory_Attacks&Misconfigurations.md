@@ -4,7 +4,7 @@ https://www.hackthebox.com/blog/8-powerful-kerberos-attacks
 https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_lyre_of_orpheus_is_kerberos_really_bulletproof_
 
 ## AS-REP Roasting 
-
+###### Kerberos preauthentication disabled
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
 
 AS-REP Roasting is a technique that enables adversaries to steal the password hashes of user accounts that have Kerberos preauthentication disabled, which they can then attempt to crack offline.
@@ -24,8 +24,8 @@ Remediation:
 ![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/11/AS-REP-Roasting-1.png.webp)
 
 NOTE:
-- there is no way of finding out users with Do not require Kerberos preauthentication set without prior foothold, ie if we dont have domain user access, then we can only guess username/password
+- If we dont have domain user access/intial foothold then there is no way to find users disabled for pre-auth, we can only guess credentials.
 - If we already have domain user/intial foothold then we can use an LDAP query to find users in the domain without Kerberos pre-authentication.
 
 
-### Misonfig: Kerberos preauthentication disabled
+
