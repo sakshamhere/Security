@@ -75,3 +75,11 @@ Kerberosting is useless for machine accuonts and service accounts,  due to the s
 Kerberosting focus on user accounts with atleast one SPN , specially admin accounts, since they probably have human-defined passwords.
 
 Once hash is obtained, Hashcat and JohnTheRipper can then be used to try cracking the hash
+
+## Kerberos Unconstrained delegations (KUD)
+
+![alt text](https://www.thehacker.recipes/assets/KUD%20mindmap.DDYXGSWu.png)
+
+## Kerberos Constrained delegations (KCD)
+
+## Resource based constrained delegations (RBCD)

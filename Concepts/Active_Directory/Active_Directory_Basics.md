@@ -219,11 +219,6 @@ When both companies merge, you will probably have different domain trees for eac
 At a certain point, a user at THM UK might need to access a shared file in one of MHT ASIA servers. For this to happen, domains arranged in trees and forests are joined together by trust relationships.
 
 
-### Delegations
-
-One of the nice things you can do in AD is to give specific users some control over some OUs. This process is known as `delegation` and allows you to grant users specific privileges to perform advanced tasks on OUs without needing a Domain Administrator to step in.
-
-
 
 # Active Directory Authentication Methods
 
@@ -375,3 +370,17 @@ This authentication mechanism is heavily used by the services on a internal netw
 - Exposed `VPN endpoints` that were integrated with AD.
 
 - `Web applications` that are internet-facing and make use of NetNTLM.
+
+# Delegations
+Delegations enables you to grant users/services the permissions to perform tasks that require elevated permissions.
+
+## Active Directory delegation
+
+For Example Help Desk group is given permission to reset passwords for users. this is a type of active directory delegation.
+
+## Kerberos Delegation
+
+Kerberos delegations allow services to access other services on behalf of domain users.
+
+The practical use of Kerberos delegation is to enable an application to access resources hosted on a different server. For example an application, such as a web server, needs to access resources for the website hosted somewhere else, such as a SQL database you can allow that service account to be delegated to the SQL server service. Once a user logs into the website, the service account will request access to the SQL server service on behalf of that user. This allows the user to get access to the content in the database that they’ve been provisioned to, without having to provision any access to the web server’s service account itself.
+
