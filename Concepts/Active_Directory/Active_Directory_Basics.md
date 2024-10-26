@@ -237,6 +237,7 @@ Whenever a user tries to authenticate to a service using domain credentials, the
 ## Kerberos Authentication (KRTGT)
 https://www.youtube.com/watch?v=OuJe0d1NGaM
 https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/b4af186e-b2ff-43f9-b18e-eedb366abf13
+https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_three_heads_of_kerberos_authentication_kdc_realms__tickets
 
 Okay, so we have our three parties: The client (user/human), the application / service (say SMB share), and the trusted third party (KDC) and this user (service principal) wants to access the SMB share service.
 
