@@ -5,6 +5,7 @@ https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_lyre_of_orph
 https://www.prosec-networks.com/en/blog/kerberos-attacks/
 https://www.thehacker.recipes/ad/movement/kerberos/pre-auth-bruteforce
 https://www.cybertriage.com/blog/dfir-breakdown-kerberoasting/
+https://blog.netwrix.com/2022/12/02/unconstrained-delegation/
 ## Username Enumeration
 ###### (preauth burteforced)
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
@@ -56,7 +57,7 @@ NOTE:
 - If we already have domain user/intial foothold then we can use an LDAP query to find users in the domain without Kerberos pre-authentication.
 
 ## Kerberosting
-###### (user accounts with SPN)
+###### (user/admin accounts with SPN)
 
 In Kerberos auth user asks for a (service ticket) ST from KDC, for this user needs to present a valid TGT (Ticket Granting Ticket) along with SPN (Service Principal Name) of the service it want to access.
 
@@ -76,10 +77,21 @@ Kerberosting focus on user accounts with atleast one SPN , specially admin accou
 
 Once hash is obtained, Hashcat and JohnTheRipper can then be used to try cracking the hash
 
-## Kerberos Unconstrained delegations (KUD)
+## Kerberos Delegation Attacks
+
+Kerberos Delegation is a feature that allows an application to reuse the end-user credentials to access recourses hosted on a different server. You should only allow that if you really trust the application server, otherwise the application may use your credentials to purposes that you didn't think of, like sending e-mails on your behalf or changing data in a mission critical application pretending that you made that change.
+
+For that reason, delegation is not enabled by default in Active Directory. You - or more likely the domain administrator - must explicit make the decision that this particular application is trusted for delegation. 
+
+![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/12/Unconstrained-Delegation-1.png.webp)
+
+### Kerberos Unconstrained delegations (KUD)
+
+In Unconstrained delegation a service can impersonate users on any other service.
+
 
 ![alt text](https://www.thehacker.recipes/assets/KUD%20mindmap.DDYXGSWu.png)
 
-## Kerberos Constrained delegations (KCD)
+### Kerberos Constrained delegations (KCD)
 
-## Resource based constrained delegations (RBCD)
+### Resource based constrained delegations (RBCD)

@@ -379,8 +379,13 @@ Delegations enables you to grant users/services the permissions to perform tasks
 For Example Help Desk group is given permission to reset passwords for users. this is a type of active directory delegation.
 
 ## Kerberos Delegation
+https://learn.microsoft.com/en-us/archive/blogs/autz_auth_stuff/kerberos-delegation
 
 Kerberos delegations allow services to access other services on behalf of domain users.
+
+Kerberos Delegation is a feature that allows an application to reuse the end-user credentials to access recourses hosted on a different server. You should only allow that if you really trust the application server, otherwise the application may use your credentials to purposes that you didn't think of, like sending e-mails on your behalf or changing data in a mission critical application pretending that you made that change.
+
+For that reason, delegation is not enabled by default in Active Directory. You - or more likely the domain administrator - must explicit make the decision that this particular application is trusted for delegation. 
 
 The practical use of Kerberos delegation is to enable an application to access resources hosted on a different server. For example an application, such as a web server, needs to access resources for the website hosted somewhere else, such as a SQL database you can allow that service account to be delegated to the SQL server service. Once a user logs into the website, the service account will request access to the SQL server service on behalf of that user. This allows the user to get access to the content in the database that they’ve been provisioned to, without having to provision any access to the web server’s service account itself.
 
