@@ -20,6 +20,10 @@ Present/Enabled	KDC_ERR_PREAUTH_REQUIRED    Additional preauthentication require
 Locked/Disabled	KDC_ERR_CLIENT_REVOKED      The client's credentials have been revoked
 Does not exist	KDC_ERR_C_PRINCIPAL_UNKNOWN Client not found in Kerberos database
 ```
+Tools - This can be done easily using tools like `Kerbrute`
+
+![alt text](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWIeARP6j9o46YNN1siF9A_lpyfcw1RTrNp2tiVBlxgPM68QpWa1wag2eQkAuUBZ7HjWwptspLbeMaRJ7vwkygwU4sAYRv8NPXovgQMOhuoXOcnByVrSUp85uM2k_a4YZSgE-xn_q8KtXOPRL7jGrZ6ZVSsGEzkobKFLYf3X9ey0cu43ceeHLAoRlMVg/s16000/4.png)
+
 
 ## AS-REP Roasting 
 ###### (preauthentication disabled)
