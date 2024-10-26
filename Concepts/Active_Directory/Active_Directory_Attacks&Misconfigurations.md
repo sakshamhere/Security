@@ -18,6 +18,7 @@ When pre-authentication is enabled, pre-authentication details are sent with AS-
 When pre-authentication is is disabled, the attacker can request TGT for any user and get the TGT and session key encrypted with his choice of user. The attacker can then attempt to crack the user's password offline. 
 
 
+![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/11/AS-REP-Roasting-1.png.webp)
 
 
 ### Misonfig: Kerberos preauthentication disabled
