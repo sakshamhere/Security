@@ -4,7 +4,7 @@ https://www.hackthebox.com/blog/8-powerful-kerberos-attacks
 https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_lyre_of_orpheus_is_kerberos_really_bulletproof_
 
 ## AS-REP Roasting 
-###### Kerberos preauthentication disabled
+### Kerberos preauthentication disabled
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
 
 AS-REP Roasting is a technique that enables adversaries to steal the password hashes of user accounts that have Kerberos preauthentication disabled, which they can then attempt to crack offline.
