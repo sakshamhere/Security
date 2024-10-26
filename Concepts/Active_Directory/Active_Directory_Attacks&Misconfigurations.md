@@ -2,9 +2,27 @@
 # Kerberos Attacks
 https://www.hackthebox.com/blog/8-powerful-kerberos-attacks
 https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_lyre_of_orpheus_is_kerberos_really_bulletproof_
+https://www.prosec-networks.com/en/blog/kerberos-attacks/
+https://www.thehacker.recipes/ad/movement/kerberos/pre-auth-bruteforce
+
+## Username Enumeration
+###### (preauth burteforced)
+Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
+
+When sending an authentication request (AS-REQ), an attacker can use the response from the KDC to determine whether a user exists or not. This allows attackers to effectively brute force by using word lists of usernames. 
+
+However, performing a brute force attack may result in user accounts being suspended. Therefore, the attackers should be careful with this Kerberos attack.
+
+Attackers use the enumeration of usernames via the following Kerberos error codes out:
+```
+user            status	                    Kerberos error
+Present/Enabled	KDC_ERR_PREAUTH_REQUIRED    Additional preauthentication required
+Locked/Disabled	KDC_ERR_CLIENT_REVOKED      The client's credentials have been revoked
+Does not exist	KDC_ERR_C_PRINCIPAL_UNKNOWN Client not found in Kerberos database
+```
 
 ## AS-REP Roasting 
-###### (Kerberos preauthentication disabled)
+###### (preauthentication disabled)
 
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
 
