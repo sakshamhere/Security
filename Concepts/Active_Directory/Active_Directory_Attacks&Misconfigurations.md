@@ -17,6 +17,9 @@ When pre-authentication is enabled, pre-authentication details are sent with AS-
 
 When pre-authentication is is disabled, the attacker can request TGT for any user and get the TGT and session key encrypted with his choice of user. The attacker can then attempt to crack the user's password offline. 
 
+Remediation: 
+1. Make sure all accounts in your domain have the Kerberos pre-authentication enabled . Luckliy the pre-auth is enabled by default.
+2. Effective Password Policy essential for Active Directory to ensure your environment is not vulnerable to AS-REP roasting. If a strong password is used on a vulnerable account, it is virtually impossible to "break" the encryption by guessing the password.
 
 ![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/11/AS-REP-Roasting-1.png.webp)
 
