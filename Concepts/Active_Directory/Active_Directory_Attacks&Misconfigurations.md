@@ -23,5 +23,9 @@ Remediation:
 
 ![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/11/AS-REP-Roasting-1.png.webp)
 
+NOTE:
+- there is no way of finding out users with Do not require Kerberos preauthentication set without prior foothold, ie if we dont have domain user access, then we can only guess username/password
+- If we already have domain user/intial foothold then we can use an LDAP query to find users in the domain without Kerberos pre-authentication.
+
 
 ### Misonfig: Kerberos preauthentication disabled
