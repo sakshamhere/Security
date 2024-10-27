@@ -7,6 +7,8 @@ https://www.thehacker.recipes/ad/movement/kerberos/pre-auth-bruteforce
 https://www.cybertriage.com/blog/dfir-breakdown-kerberoasting/
 https://blog.netwrix.com/2022/12/02/unconstrained-delegation/
 https://www.qomplx.com/blog/qomplx-knowledge-kerberos-delegation-attacks-explained/
+https://adsecurity.org/?p=1667
+
 ## Username Enumeration
 ###### (preauth burteforced)
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
@@ -98,16 +100,33 @@ When user request TGS for a ST of server/service which is having unconstrained d
 
 When user presents this ST to a service/server on which unconstrained delegation is on, then that server/service stores takes the copy TGT from this ST and stores it in its memory ie LSASS ( Local Security Authority Subsystem Service ) and now it can use this TGT on behalf of that user again for lifetime until the ST service ticket expires.
 
-Now if attacker has compromised the machine/server which has service configured for uncontrained delegation then he can simply wait for victim user to connect to such service/server so its TGT gets saved local memory.
-
-Attacker will start a listener on compromised machine using tool such as `Rubeus` and wait for user to connect, once victim user conects to service presenting it ST, the attacker will get the ST and extract TGT out of it.
-
-Attacker can then use this TGT with `mimikatz` and use it to extract the krbtgt hash with lsadump::dcsync.
-
+Discovering computers with Kerberos unconstrained delegation is fairly easy using the Active Directory PowerShell module cmdlet, Get-ADComputer.
+- Unconstrained Delegation: TrustedForDelegation = True
+- Constrained Delegation: TrustedToAuthForDelegation = True
+![alt text](https://adsecurity.org/wp-content/uploads/2015/08/KerberosUnConstrainedDelegation-PowerShell-DiscoverServers2.png)
 
 
+As an Attacker, once you have found a server with Kerberos Unconstrained Delegation you will then
 
-![alt text](https://www.thehacker.recipes/assets/KUD%20mindmap.DDYXGSWu.png)
+1. First Compromise the server via an admin or service account.
+2. Then Social engineer a Domain Admin/user or wait for him to connect to any service on the server with unconstrained delegation.
+
+When the admin/user connects to this service, his TGS service ticket (with the TGT) is delivered to the server and placed into LSASS. Now the user's authentication (TGT) ticket can be extracted using `Mimikatz` and re-used (until the ticket lifetime expires).
+
+![alt text](https://adsecurity.org/wp-content/uploads/2015/08/KerberosUnConstrainedDelegation-Mimikatz-Ticket-Export-LS-TGT-TicketDetail2.png)
+![alt text](https://adsecurity.org/wp-content/uploads/2015/08/KerberosUnConstrainedDelegation-Mimikatz-PTT-LS-Ticket2.png)
+
+And if this user is Domain Admin, then the ticket can be used immediately in order to get the domain KRBTGT account password hash using `Mimikatz`
+
+![alt text](https://adsecurity.org/wp-content/uploads/2015/08/KerberosUnConstrainedDelegation-PSRemote-ADSDC02-Mimikatz-KRBTGT2.png)
+
+Remediation
+- Don’t use Kerberos Unconstrained Delegation – configure servers that require delegation with Constrained Delegation.
+- Configure all elevated administrator accounts to be “Account is sensitive and cannot be delegated”.
+- The “Protected Users” group, available starting with Windows Server 2012 R2 Domain Functional Level also mitigates against this issue since delegation is not allowed for accounts in this group.
+
+
+
 
 ### Constrained delegations 
 

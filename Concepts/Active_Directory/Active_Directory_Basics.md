@@ -234,17 +234,24 @@ https://www.youtube.com/watch?v=OuJe0d1NGaM
 https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/b4af186e-b2ff-43f9-b18e-eedb366abf13
 https://www.hackthebox.com/blog/what-is-kerberos-authentication#the_three_heads_of_kerberos_authentication_kdc_realms__tickets
 
-Okay, so we have our three parties: The client (user/human), the application / service (say SMB share), and the trusted third party (KDC) and this user (service principal) wants to access the SMB share service.
+Okay, so we have our three parties: 
+1. The client/user (Service Principal)
+2. The application server / service
+3. the trusted third party KDC (Key Distribution Center)
+    - AS (Authentication Service)
+    - TGS (Ticket Granting Service)
 
-1. First when user logs in workstation it authenticates to KDC's Authentication Service (AS), it provides credentials and expects a ticket in exchange.
+Kerberos Communication Flow:
 
-Client/user sends AS_REQ to KDC, it presents its principal name and pre-authentication details, The AS will then verify user and if its legitimate user it will respond back with a Ticket Granting Ticket (TGT) with a session key, this is AS_REP. The user can use this TGT and sesion key to have an encrypted communication further with KDC, this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal.
+1. First when user logs in workstation it provides its username and password, the current timestamp is encrypted with passwords NTLM hash this encrypted timestamp and other pre-authentication details is then sent to to KDC's Authentication Service (AS).
+
+Client/user sends AS_REQ to KDC, it presents its user principal name (UPN), encrypted timestamp and pre-authentication details, The AS will then verify by decrypting timestamp from user's hash in DC and verify other preauthentication details,  if its legitimate user it will respond back with a Ticket Granting Ticket (TGT) with a session key,  this session key is encrypted with user's NT hash., this is AS_REP. The user can use this TGT and sesion key to have an encrypted communication further with KDC, this authentication with KDC's Authentication Service only takes one time, since it provides the session key which can be used multiple time by service principal.
 
 2. Now if client/user wants to access any service (Say SMB share), he will now request to KDC's Ticket Granting Service(TGS) to provide a Service Ticket for the service.
 
-Client/user will send TGS_REQ to KDC , its current TGT along with a Service Prinicipal Name (SPN) of service for which it wants service ticket. The KDC's TGS will validate TGT presented and if everything is fine it will response TGS_REP with the service tciket and a session key, the client can then use this service ticket and sesion key to connect with the Service for which it requested service ticket.
+Client/user will send TGS_REQ to KDC , its current TGT along with a Service Prinicipal Name (SPN) of service for which it wants service ticket. The KDC's TGS will validate TGT presented and if everything is fine it will response TGS_REP with the service tciket encrypted with NTLM hash of service account, the client can then use this service ticket to connect with the server which has Service for which it requested service ticket.
 
-3. Now client/user can present the service ticket and session key to the service/server it wants to access. The service/server will decrypt the ticket and validate it. If thins are fine then it grants the access.
+3. Now client/user can present the service ticket to the service/server it wants to access. The service/server will decrypt the ticket and validate it. If thins are fine then it grants the access.
 
 
 ![alt text](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/ms-kile_files/image001.png)
