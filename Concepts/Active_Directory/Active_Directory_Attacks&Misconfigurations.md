@@ -6,6 +6,7 @@ https://www.prosec-networks.com/en/blog/kerberos-attacks/
 https://www.thehacker.recipes/ad/movement/kerberos/pre-auth-bruteforce
 https://www.cybertriage.com/blog/dfir-breakdown-kerberoasting/
 https://blog.netwrix.com/2022/12/02/unconstrained-delegation/
+https://www.qomplx.com/blog/qomplx-knowledge-kerberos-delegation-attacks-explained/
 ## Username Enumeration
 ###### (preauth burteforced)
 Kerberos is all about getting service ticket by preseting valid TGT to KDC's TGS, but to get this TGT user first needs to authenticate itself to KDC's AS by presenting its pre-authentication details.
@@ -77,7 +78,7 @@ Kerberosting focus on user accounts with atleast one SPN , specially admin accou
 
 Once hash is obtained, Hashcat and JohnTheRipper can then be used to try cracking the hash
 
-## Kerberos Delegation Attacks
+## Delegation Attacks
 
 Kerberos Delegation is a feature that allows an application to reuse the end-user credentials to access recourses hosted on a different server. You should only allow that if you really trust the application server, otherwise the application may use your credentials to purposes that you didn't think of, like sending e-mails on your behalf or changing data in a mission critical application pretending that you made that change.
 
@@ -85,13 +86,29 @@ For that reason, delegation is not enabled by default in Active Directory. You -
 
 ![alt text](https://cdn-blog.netwrix.com/wp-content/uploads/2022/12/Unconstrained-Delegation-1.png.webp)
 
-### Kerberos Unconstrained delegations (KUD)
+Note that another option is resource-based constrained delegation (RBCD), in which delegation is configured on the resource, rather than on the accounts accessing the resource. RBCD can be set up using Windows PowerShell.
 
-In Unconstrained delegation a service can impersonate users on any other service.
+### Unconstrained delegations 
+
+In Unconstrained delegation a service can impersonate user to access any other service on behalf of user.
+
+What actually happens:
+
+When user request TGS for a ST of server/service which is having unconstrained delegation on, the TGS will attach a copy of TGT into the ST in this case and send back.
+
+When user presents this ST to a service/server on which unconstrained delegation is on, then that server/service stores takes the copy TGT from this ST and stores it in its memory ie LSASS ( Local Security Authority Subsystem Service ) and now it can use this TGT on behalf of that user again for lifetime until the ST service ticket expires.
+
+Now if attacker has compromised the machine/server which has service configured for uncontrained delegation then he can simply wait for victim user to connect to such service/server so its TGT gets saved local memory.
+
+Attacker will start a listener on compromised machine using tool such as `Rubeus` and wait for user to connect, once victim user conects to service presenting it ST, the attacker will get the ST and extract TGT out of it.
+
+Attacker can then use this TGT with `mimikatz` and use it to extract the krbtgt hash with lsadump::dcsync.
+
+
 
 
 ![alt text](https://www.thehacker.recipes/assets/KUD%20mindmap.DDYXGSWu.png)
 
-### Kerberos Constrained delegations (KCD)
+### Constrained delegations 
 
-### Resource based constrained delegations (RBCD)
+### Resource based constrained delegations 
