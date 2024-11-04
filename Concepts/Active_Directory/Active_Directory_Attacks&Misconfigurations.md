@@ -8,6 +8,8 @@ https://www.cybertriage.com/blog/dfir-breakdown-kerberoasting/
 https://blog.netwrix.com/2022/12/02/unconstrained-delegation/
 https://www.qomplx.com/blog/qomplx-knowledge-kerberos-delegation-attacks-explained/
 https://adsecurity.org/?p=1667
+https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc738207(v=ws.10)
+
 
 ## Username Enumeration
 ###### (preauth burteforced)
@@ -108,8 +110,8 @@ Discovering computers with Kerberos unconstrained delegation is fairly easy usin
 
 As an Attacker, once you have found a server with Kerberos Unconstrained Delegation you will then
 
-1. First Compromise the server via an admin or service account.
-2. Then Social engineer a Domain Admin/user or wait for him to connect to any service on the server with unconstrained delegation.
+1. First Compromise the server with Unconstrained Delegation via an admin or service account.
+2. Then Social engineer a Domain Admin/user or simply wait for Admin/user to connect to any service on this compromised server with unconstrained delegation. (`Rubeus` tool can be used for this)
 
 When the admin/user connects to this service, his TGS service ticket (with the TGT) is delivered to the server and placed into LSASS. Now the user's authentication (TGT) ticket can be extracted using `Mimikatz` and re-used (until the ticket lifetime expires).
 
@@ -126,8 +128,37 @@ Remediation
 - The “Protected Users” group, available starting with Windows Server 2012 R2 Domain Functional Level also mitigates against this issue since delegation is not allowed for accounts in this group.
 
 
-
-
 ### Constrained delegations 
+Using constrained delegation, systems within an Active Directory environment trust only specified services. Constrained delegation limits what services are accessible by a delegated computer.
+
+Beginning with Windows Server 2003, Microsoft offeredn a new extensions in the implementation of the Kerberos protocol called:
+- `Protocol transition`
+
+Constrained delegation can be configured with or without protocol transition. Abuse methodology differs for each scenario. The paths differ but the result is the same ie a Service Ticket to authenticate on a target service on behalf of a user.
+
+#### Protocol transition
+
+Services that rely on Kerberos for authentication leverage protocol transition to obtain Kerberos service tickets `for users or proxies that are not part of the Kerberos environment`
+
+The protocol transition extension allows a service that uses Kerberos to obtain a Kerberos service ticket on behalf of a User/Kerberos principal to the service without requiring the principal to initially authenticate to the Kerberos Key Distribution Center (KDC) with a credential.
+
+An attacker can abuse this in a similar way, and impersonate users without the need for their password.
+
+The constrained delegation designation relies on two Kerberos extensions known as `S4U2Self` and `S4U2Proxy`
+
+##### S4U2Self
+
+The S4U2Self extension permits accounts to request service tickets to themselves for a given user. The issued ticket will be marked by the domain controller as “forwardable.”
+
+##### S4U2Proxy
+
+The S4U2Proxy extension uses the forwardable service ticket to request a ticket to a SPN in the `msDS-AllowedToDelegateTo` field of the requesting service.
+
+
+
+##### Constrianed without protocol transition
+
+
+##### Constrianed with protocol transition
 
 ### Resource based constrained delegations 
