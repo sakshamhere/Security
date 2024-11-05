@@ -146,11 +146,9 @@ An attacker can abuse this in a similar way, and impersonate users without the n
 
 The constrained delegation designation relies on two Kerberos extensions known as `S4U2Self` and `S4U2Proxy`
 
-##### S4U2Self
+##### S4U2Self & S4U2Proxy
 
 The S4U2Self extension permits accounts to request service tickets to themselves for a given user. The issued ticket will be marked by the domain controller as “forwardable.”
-
-##### S4U2Proxy
 
 The S4U2Proxy extension uses the forwardable service ticket to request a ticket to a SPN in the `msDS-AllowedToDelegateTo` field of the requesting service.
 
