@@ -213,3 +213,27 @@ nonce (IV) → must be unique for each encryption with the same key
 | TLS 1.2     | `TLS_CHACHA20_POLY1305_SHA256` | ChaCha20-Poly1305 |
 | TLS 1.3     | `TLS_AES_256_GCM_SHA384`       | AES-GCM           |
 | TLS 1.3     | `TLS_CHACHA20_POLY1305_SHA256` | ChaCha20-Poly1305 |
+
+
+#  SHA-1 and MD5
+
+SHA-1 (Secure Hash Algorithm 1) and MD5 (Message Digest Algorithm 5) were widely used cryptographic hash functions, but both have been found to have significant weaknesses that make them insecure for use in modern cryptography.
+
+## Security Issues
+
+### Collision Attacks
+
+MD5 is susceptible to collision attacks, where two different inputs (messages) can produce the same hash value. This vulnerability allows an attacker to generate two different documents with the same MD5 hash, undermining the integrity of the hashing mechanism.
+
+In 2012  Google demonstrated the first collision attack on MD5 that was practical enough to affect SSL certificates and could have led to fraudulent certificates being issued
+
+Like MD5, SHA-1 is also vulnerable to collision attacks. In fact, SHA-1 has been proven to be weaker than originally thought.
+
+In 2017, researchers from Google and CWI Amsterdam demonstrated a practical collision attack on SHA-1 called SHAttered, which showed how two distinct documents could be forged to have the same SHA-1 hash.
+
+
+Due to the weaknesses in MD5 and SHA-1, more secure hash algorithms have been developed. The most widely accepted modern alternatives include `SHA-256 (from the SHA-2 family) and SHA-3`.
+
+# SHA-2 Family (SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, SHA-512/256)
+
+# SHA-3 Family (SHA3-224, SHA3-256, SHA3-384, SHA3-512)
