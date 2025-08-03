@@ -15,7 +15,6 @@
 | **CBC-MAC (MAC-then-Encrypt)** | SSL 2.0, SSL 3.0, TLS 1.0  | Vulnerable to length extension attacks, Weak security | Deprecated in TLS 1.1 and above                     |
 | **RC4**                        | SSL 3.0, TLS 1.0, 1.1      | Vulnerable to key stream biases, weak encryption      | Deprecated in TLS 1.2 and above, Removed in TLS 1.3 |
 | **AEAD**                       | TLS 1.2, TLS 1.3           | Highly secure, prevents replay attacks, fast          | Mandatory in TLS 1.3, Optional in TLS 1.2           |
-                          |
 
 *********************************************************************************************************************
 
@@ -30,6 +29,15 @@
 
 
 ***********************************************************************************************
+| **TLS Version** | **Supported Hashing Algorithms** | **Primary Use**                                     | **Security Concerns**                                               |
+| --------------- | -------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| **TLS 1.0**     | MD5, SHA-1                       | **HMAC** for message authentication                 | **MD5** and **SHA-1** vulnerable to collision attacks               |
+| **TLS 1.1**     | MD5, SHA-1                       | **HMAC** for message authentication                 | **SHA-1** and **MD5** still weak                                    |
+| **TLS 1.2**     | MD5, SHA-1, SHA-256, SHA-384     | **HMAC**, key derivation                            | **SHA-1** deprecated, **SHA-256** recommended for stronger security |
+| **TLS 1.3**     | SHA-256, SHA-384                 | **HMAC**, key derivation (only SHA-256 recommended) | **SHA-1** and **MD5** completely removed. **SHA-256** is mandatory. |
+*******************************************************************************************************
+
+
 # CBC (Cipher Block Chaining) Cipher Mode
 
 CBC (Cipher Block Chaining) is a block cipher mode of operation used for encrypting data. It's one of the modes that can be used with block ciphers like AES or 3DES to turn them into stream-like ciphers suitable for encrypting longer messages.
@@ -170,3 +178,38 @@ Key Features:
 | Protects non-encrypted data too | ✅ (via AAD)    |
 
 AEAD modes like `AES-GCM`, `AES-CCM`, and `ChaCha20-Poly1305` are now the default encryption mechanisms in TLS 1.3 and recommended in TLS 1.2. They are fast, secure, and solve the serious problems that affected older cipher modes like CBC.
+
+## How AEAD Works
+
+An AEAD cipher encrypts data like this:
+```
+ciphertext, auth_tag = AEAD_Encrypt(
+    key, 
+    nonce, 
+    plaintext, 
+    associated_data
+)
+
+plaintext → encrypted
+associated_data (AAD) → authenticated but not encrypted (e.g., headers)
+auth_tag → appended to verify integrity on decryption
+nonce (IV) → must be unique for each encryption with the same key
+```
+
+## What AEAD Prevents
+
+| Attack Type                   | Prevented by AEAD? | Why?                                      |
+| ----------------------------- | ------------------ | ----------------------------------------- |
+| Padding Oracle (e.g. POODLE)  | ✅                  | No padding                                |
+| MAC tampering                 | ✅                  | Built-in tag verification                 |
+| Replay (with nonce misuse)    | ❌ (depends)        | Needs good nonce management               |
+| Timing attacks (e.g. Lucky13) | ✅                  | No separate MAC, constant-time decryption |
+
+## Example Cipher Suites That Use AEAD
+
+| TLS Version | Cipher Suite                   | AEAD Algorithm    |
+| ----------- | ------------------------------ | ----------------- |
+| TLS 1.2     | `TLS_AES_128_GCM_SHA256`       | AES-GCM           |
+| TLS 1.2     | `TLS_CHACHA20_POLY1305_SHA256` | ChaCha20-Poly1305 |
+| TLS 1.3     | `TLS_AES_256_GCM_SHA384`       | AES-GCM           |
+| TLS 1.3     | `TLS_CHACHA20_POLY1305_SHA256` | ChaCha20-Poly1305 |
