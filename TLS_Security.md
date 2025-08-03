@@ -38,6 +38,18 @@
 | ✅ **Modern Recommendation**      | ❌ Deprecated                           | ❌ Deprecated                                                  | ✅ Strongly recommended                               |
 
 *********************************************************************************************************************
+
+| **SSL/TLS Version** | **Supported Cipher Modes**                         | **Description**                                                 | **Security Notes**                                                         |
+| ------------------- | -------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **SSL 2.0**         | None (weak custom schemes)                         | Used proprietary/weak mechanisms without proper cipher modes.   | ❌ Obsolete and insecure. Never use.                                        |
+| **SSL 3.0**         | CBC (e.g., **3DES-CBC**, **AES-CBC**)              | First to support modern block ciphers in CBC mode.              | ❌ Vulnerable to padding oracle and BEAST attacks. Deprecated.              |
+| **TLS 1.0**         | CBC (AES-CBC, 3DES-CBC)                            | Encryption with HMAC for integrity (MAC-then-encrypt).          | ❌ BEAST, padding oracle, and IV reuse vulnerabilities.                     |
+| **TLS 1.1**         | CBC (AES-CBC, 3DES-CBC)                            | Same as TLS 1.0, but fixed IV issues by using random IVs.       | ⚠️ Still vulnerable to Lucky13 and padding oracle attacks.                 |
+| **TLS 1.2**         | CBC (AES-CBC), AEAD (**AES-GCM**, **CCM**),        | Supports both CBC (legacy) and modern AEAD modes.               | ✅ Use AEAD (e.g., AES-GCM, ChaCha20-Poly1305); ❌ avoid CBC where possible. |
+|                     | Stream (e.g., RC4 – deprecated)                    | Stream cipher support exists but deprecated due to biases.      | ❌ RC4 is completely insecure.                                              |
+| **TLS 1.3**         | **AEAD-only**: AES-GCM, AES-CCM, ChaCha20-Poly1305 | Only allows AEAD modes. MAC-then-encrypt and CBC modes removed. | ✅ Strong security. All known attacks mitigated.                            |
+
+***********************************************************************************************
 # CBC (Cipher Block Chaining) Cipher Mode
 
 CBC (Cipher Block Chaining) is a block cipher mode of operation used for encrypting data. It's one of the modes that can be used with block ciphers like AES or 3DES to turn them into stream-like ciphers suitable for encrypting longer messages.
@@ -129,3 +141,16 @@ Mitigation and Fixes
 
 
 # AEAD (Authenticated Encryption with Associated Data) Cipher Mode
+
+It’s a cryptographic mode of operation that provides: Confidentiality (via encryption), Integrity and authenticity (via authentication tag) and Optional associated data authentication (e.g., headers)
+
+Key Features:
+
+| Feature                         | AEAD Provides? |
+| ------------------------------- | -------------- |
+| Encryption                      | ✅              |
+| Message Authentication (MAC)    | ✅              |
+| Combined operation              | ✅              |
+| Protects non-encrypted data too | ✅ (via AAD)    |
+
+AEAD modes like `AES-GCM`, `AES-CCM`, and `ChaCha20-Poly1305` are now the default encryption mechanisms in TLS 1.3 and recommended in TLS 1.2. They are fast, secure, and solve the serious problems that affected older cipher modes like CBC.
