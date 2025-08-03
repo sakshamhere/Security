@@ -9,33 +9,13 @@
 
 **********************************************************************************************
 
-| **TLS Version** | **CBC** | **CBC-MAC (MAC-then-encrypt)** | **AEAD (e.g., AES-GCM)** |
-| --------------- | ------- | ------------------------------ | ------------------------ |
-| **SSL 3.0**     | ✅ Yes   | ✅ Yes                          | ❌ No                     |
-| **TLS 1.0**     | ✅ Yes   | ✅ Yes                          | ❌ No                     |
-| **TLS 1.1**     | ✅ Yes   | ✅ Yes                          | ❌ No                     |
-| **TLS 1.2**     | ✅ Yes   | ✅ Yes                          | ✅ Optional               |
-| **TLS 1.3**     | ❌ No    | ❌ No                           | ✅ Mandatory              |
-
-
-***********************************************************************************************
-
-| **Factor**                       | **CBC (Cipher Block Chaining)**        | **CBC-MAC (MAC-then-Encrypt)**                                | **AEAD (e.g., AES-GCM, ChaCha20-Poly1305)**          |
-| -------------------------------- | -------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
-| 🔐 **Primary Purpose**           | Confidentiality (encryption)           | Confidentiality + integrity (via MAC)                         | Confidentiality + integrity + optional AAD           |
-| 📥 **Input**                     | Plaintext                              | Plaintext                                                     | Plaintext + optional Associated Data (AAD)           |
-| 📤 **Output**                    | Ciphertext                             | Ciphertext + MAC (appended before encryption)                 | Ciphertext + Auth Tag                                |
-| 🔁 **MAC Applied To**            | ❌ No MAC                               | ✅ Plaintext (before encryption)                               | ✅ Ciphertext (integrated, or encrypt + MAC together) |
-| 🔑 **Key Usage**                 | One key for encryption                 | Two keys: encryption + MAC                                    | One key (or internally derived subkeys)              |
-| 🛡️ **Integrity Protection**     | ❌ None                                 | ✅ Partial (but flawed; see vulnerabilities)                   | ✅ Yes (strong)                                       |
-| 🔓 **Decryption Before Verify?** | Yes                                    | ✅ Yes (MAC is on plaintext)                                   | ❌ No (MAC checked first)                             |
-| 🧪 **MAC-then-Encrypt?**         | ❌ Not used                             | ✅ Yes (HMAC on plaintext → then encrypted)                    | ❌ No (Encrypt-then-MAC or integrated)                |
-| ⚠️ **Known Vulnerabilities**     | Padding oracle, IV reuse               | Lucky13, padding oracle, BEAST (due to decryption before MAC) | Nonce reuse (in AEAD), but mitigatable               |
-| 🧠 **Complexity**                | Simple                                 | Moderate (needs HMAC and padding handling)                    | Higher, but cleaner API                              |
-| 📏 **Handles Variable Length**   | ✅ Yes (with padding)                   | ❌ No (CBC-MAC itself is for fixed-length)                     | ✅ Yes (built-in handling)                            |
-| 🧾 **Used in TLS?**              | ✅ Yes (TLS 1.0–1.2, CBC cipher suites) | ✅ Yes (TLS 1.0–1.2 use MAC-then-encrypt with CBC)             | ✅ Yes (TLS 1.2 optional, TLS 1.3 only allows AEAD)   |
-| 🔄 **Replay Protection**         | ❌ No                                   | ❌ No                                                          | ✅ Yes (via nonce/IV and tag verification)            |
-| ✅ **Modern Recommendation**      | ❌ Deprecated                           | ❌ Deprecated                                                  | ✅ Strongly recommended                               |
+| Cipher Mode                    | SSL/TLS Versions           | Security Issues & Vulnerabilities                     | Protocol Compatibility                              |
+| ------------------------------ | -------------------------- | ----------------------------------------------------- | --------------------------------------------------- |
+| **CBC**                        | SSL 3.0, TLS 1.0, 1.1, 1.2 | Padding oracle attacks, BEAST attack, Slow to process | Deprecated in TLS 1.3                               |
+| **CBC-MAC (MAC-then-Encrypt)** | SSL 2.0, SSL 3.0, TLS 1.0  | Vulnerable to length extension attacks, Weak security | Deprecated in TLS 1.1 and above                     |
+| **RC4**                        | SSL 3.0, TLS 1.0, 1.1      | Vulnerable to key stream biases, weak encryption      | Deprecated in TLS 1.2 and above, Removed in TLS 1.3 |
+| **AEAD**                       | TLS 1.2, TLS 1.3           | Highly secure, prevents replay attacks, fast          | Mandatory in TLS 1.3, Optional in TLS 1.2           |
+                          |
 
 *********************************************************************************************************************
 
@@ -96,17 +76,13 @@ Especially affected web browsers using TLS 1.0 and Most browsers at the time sti
 
 Note - AES-CBC is still vulnerable unless you're on TLS 1.1+
 
-# CBC mode + HMAC (CBC-MAC) ( MAC-then-encrypt )
+# CBC + HMAC ( MAC-then-encrypt) Cipher Mode
 
 MAC-then-Encrypt was traditionally thought to: Provide integrity and authenticity via MAC adding to confidentiality provided via encryption.
 
 It was standard practice in older protocols, including TLS 1.0 and 1.1, and optionally in TLS 1.2.
 
-### Lucky13 attack (2013)
-
-“Lucky13” refers to the `length of a specific piece of TLS padding (13 bytes)` that causes a detectable time difference during decryption. It arise from how `TLS MAC (Message Authentication Code) and padding validation` are performed in different TLS implementations.
-
-It was first disclosed in 2013 and affects implementations of `TLS 1.0, TLS 1.1, and TLS 1.2` — specifically those using` MAC-then-encrypt` CBC cipher suites.
+## How it works
 
 TLS CBC mode combines MAC-then-encrypt:
 
@@ -121,6 +97,14 @@ Upon receiving a record:
 2. Check and remove padding.
 3. Validate MAC.
 4. If padding or MAC is incorrect, the record is rejected.
+
+### Lucky13 attack (2013)
+
+“Lucky13” refers to the `length of a specific piece of TLS padding (13 bytes)` that causes a detectable time difference during decryption. It arise from how `TLS MAC (Message Authentication Code) and padding validation` are performed in different TLS implementations.
+
+It was first disclosed in 2013 and affects implementations of `TLS 1.0, TLS 1.1, and TLS 1.2` — specifically those using` MAC-then-encrypt` CBC cipher suites.
+
+
 
 How the Attack Works
 
@@ -138,6 +122,38 @@ Mitigation and Fixes
 
 - Avoid CBC Cipher Suites
 - Use AEAD (Authenticated Encryption with Associated Data) cipher modes
+
+# RC4 (Rivest Cipher 4) Cipher Mode
+
+RC4 (Rivest Cipher 4), also known as ARC4 (Alleged RC4), is a stream cipher that was designed by Ron Rivest in 1987.
+RC4 operates as a `stream cipher`, meaning it `encrypts data one bit or byte at a time rather than in blocks` like block ciphers (AES, DES). It was widely used for securing communication in protocols like `SSL/TLS, WEP, and WPA`. However, over time, vulnerabilities were discovered that significantly reduced its security
+
+## How RC4 Works
+
+RC4 encryption is based on the concept of a `pseudo-random key stream` that is XORed with the plaintext data.
+
+1. The algorithm takes the key and generates an internal state array (S) that is 256 bytes long.
+2. The key is used to initialize this array, mixing the state array in a way that makes it difficult to predict.
+3. The key is expanded and used to modify the state array through a permutation process.
+4. The state array is then used to generate a pseudo-random stream of bytes` (the keystream).`
+5. This keystream is XORed with the plaintext (in the encryption process) or ciphertext (in the decryption process) to produce the encrypted output or recover the plaintext.
+
+In TLS 1.2 and earlier, RC4 was allowed, but it has been deprecated due to its insecurity and vulnerabilities like RC4 biases. In TLS 1.3, RC4 is removed entirely. Modern versions of TLS only support AEAD cipher suites like AES-GCM, AES-CCM, and ChaCha20-Poly1305
+
+## Vulnerabilities in RC4
+
+1. When used in SSL/TLS, RC4 became vulnerable to several types of padding oracle and biased keystream attacks.
+2. While it was supported in earlier versions of TLS, RC4 was found to be vulnerable to BEAST (Browser Exploit Against SSL/TLS) attacks, which exploited weaknesses in the protocol to allow for chosen-plaintext attacks.
+3. `Bias in Keystream`: RC4 generates a pseudo-random keystream. However, it was discovered that early bytes of the keystream are not as random as they should be, which leads to biased output.
+4. `WEP (Wired Equivalent Privacy)`, which used RC4 for encryption, was cracked due to the reuse of the same keystream and weak initialization vector (IV). The` FMS attack` could easily break WEP in a matter of minutes using traffic analysis.
+5. `WPA (Wi-Fi Protected Access)`, although more secure, also used RC4 in the early stages, which still allowed for vulnerabilities in some cases.
+
+Note:
+
+- Many organizations have moved to `AES (Advanced Encryption Standard)` as the default encryption algorithm for securing communication.
+-` NIST` (National Institute of Standards and Technology) officially removed RC4 from its approved algorithms in 2015.
+
+Given its weaknesses, RC4 should not be used in any new systems, especially in protocols like TLS, SSL, or WEP.
 
 
 # AEAD (Authenticated Encryption with Associated Data) Cipher Mode
