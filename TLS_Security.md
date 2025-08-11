@@ -231,9 +231,14 @@ Like MD5, SHA-1 is also vulnerable to collision attacks. In fact, SHA-1 has been
 
 In 2017, researchers from Google and CWI Amsterdam demonstrated a practical collision attack on SHA-1 called SHAttered, which showed how two distinct documents could be forged to have the same SHA-1 hash.
 
+## Alternatives
 
 Due to the weaknesses in MD5 and SHA-1, more secure hash algorithms have been developed. The most widely accepted modern alternatives include `SHA-256 (from the SHA-2 family) and SHA-3`.
 
-# SHA-2 Family (SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, SHA-512/256)
+# SHA-2 and SHA-3 Family
 
-# SHA-3 Family (SHA3-224, SHA3-256, SHA3-384, SHA3-512)
+SHA-2 (Secure Hash Algorithm 2) was designed to be more secure than SHA-1, and it includes a series of algorithms with varying output lengths (224, 256, 384, and 512 bits). `SHA-256` is the most widely used version, particularly in TLS, digital signatures, and file integrity.
+
+SHA-3 is based on a different cryptographic structure called Keccak and was designed to provide a more robust alternative to SHA-2. It has the same hash lengths as SHA-2 (224, 256, 384, 512), but it uses a different algorithmic structure (sponge construction) that makes it resistant to some potential future attacks that might affect SHA-2.
+
+Both are being used in` TLS, digital signatures, and blockchains`.

