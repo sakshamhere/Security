@@ -37,6 +37,63 @@ String userInput = "%n%n%n";
 System.out.printf(userInput); // tries to write newlines 
 ```
 
+### Output Encoding
+
+HTML Encoding functions have to be called to turn hazardous HTML markup into safe strings., Most modern JavaScript frameworks such as Angular and React do this implicitly.
+
+textContent (encodes special characters automatically)
+
+Never use `innerHTML` with untrusted data. Use `.textContent` or `.innerText`.
+
+Insecure Example (No HTML Encoding)
+
+```
+// BAD: directly prints user-controlled input into HTML
+String userInput = request.getParameter("name");
+out.println("<p>Hello " + userInput + "</p>");
+```
+
+Secure HTML5 Example (with encoding / safe API)
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Example</title>
+</head>
+<body>
+  <h2>Secure Greeting</h2>
+  <div id="greeting"></div>
+
+  <script>
+    // GOOD: use textContent (encodes special characters automatically)
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "Guest";
+    document.getElementById("greeting").textContent = "Hello " + name;
+  </script>
+</body>
+</html>
+```
+
+Python (Flask with MarkupSafe / Jinja2 auto-escaping)
+```
+from flask import Flask, request, render_template_string
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.route("/greet")
+def greet():
+    name = request.args.get("name", "")
+    # GOOD: escape user input
+    safe_name = escape(name)
+    return f"<p>Hello {safe_name}</p>"
+```
+Or with Jinja2 templates:
+```
+<!-- Jinja2 auto-escapes by default -->
+<p>Hello {{ name }}</p>
+```
 
 # Input Utilization
 
@@ -153,6 +210,62 @@ def verify_password(stored: str, candidate: str) -> bool:
     derived = hashlib.pbkdf2_hmac('sha256', candidate.encode(), salt, iterations, dklen=len(expected))
     # constant-time comparison
     return hashlib.compare_digest(derived, expected)
+```
+![alt text](image-4.png)
+
+### Insecure Key storage
+
+Why bad: keys stored on disk or in source are easy to exfiltrate; no access control / rotation / audit.
+
+Non-secure (bad)
+```
+# BAD: storing raw key in plaintext file or in code
+# secret_key.txt contains the symmetric key in plaintext — anyone with filesystem access can read it.
+
+with open('/etc/myapp/secret_key.txt', 'rb') as f:
+    key = f.read()
+
+# Use key directly — no access controls, no auditing
+```
+
+Why good: data key is generated server-side by KMS and the encrypted data key (ciphertext) is stored alongside the ciphertext. KMS controls access, provides audit logs, key rotation, and you never store raw long-term keys yourself.
+
+Secure (good) — Envelope encryption with AWS KMS (Python, boto3)
+```
+# GOOD: get a data key from KMS, use it to encrypt data locally, store only the encrypted data key (ciphertext_blob)
+# Requires: IAM role/policy that restricts kms:GenerateDataKey & kms:Decrypt to authorized principals
+import boto3
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+kms = boto3.client('kms', region_name='us-west-2')  # use appropriate region/config
+
+def encrypt_with_kms(plaintext: bytes, kms_key_id: str):
+    # Generate a data key (plain + encrypted)
+    resp = kms.generate_data_key(KeyId=kms_key_id, KeySpec='AES_256')
+    plaintext_data_key = resp['Plaintext']        # raw data key (in-memory only)
+    encrypted_data_key = resp['CiphertextBlob']   # encrypted under KMS key (store this)
+
+    # Use data key to encrypt data (AES-GCM)
+    aesgcm = AESGCM(plaintext_data_key)
+    nonce = os.urandom(12)
+    ct = aesgcm.encrypt(nonce, plaintext, associated_data=None)
+
+    # wipe plaintext_data_key ASAP from memory if possible (overwrite)
+    # store: nonce || ct  and encrypted_data_key in DB/storage
+    return {
+        'encrypted_payload': nonce + ct,
+        'encrypted_data_key': encrypted_data_key
+    }
+
+def decrypt_with_kms(encrypted_payload: bytes, encrypted_data_key: bytes):
+    # Ask KMS to decrypt the data key (requires permissions & audited)
+    resp = kms.decrypt(CiphertextBlob=encrypted_data_key)
+    plaintext_data_key = resp['Plaintext']
+    nonce = encrypted_payload[:12]
+    ct = encrypted_payload[12:]
+    aesgcm = AESGCM(plaintext_data_key)
+    plaintext = aesgcm.decrypt(nonce, ct, associated_data=None)
+    return plaintext
 ```
 
 # Logging
