@@ -43,14 +43,31 @@ HTML Encoding functions have to be called to turn hazardous HTML markup into saf
 
 textContent (encodes special characters automatically)
 
-Never use `innerHTML` with untrusted data. Use `.textContent` or `.innerText`.
+Never use `innerHTML` with untrusted data. Always Use `.textContent` or `.innerText`.
+
+If a developer must write their own function, they need to cover all HTML special characters:
 
 Insecure Example (No HTML Encoding)
-
 ```
-// BAD: directly prints user-controlled input into HTML
-String userInput = request.getParameter("name");
-out.println("<p>Hello " + userInput + "</p>");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Insecure Example</title>
+</head>
+<body>
+  <h2>Insecure Greeting</h2>
+  <div id="greeting"></div>
+
+  <script>
+    // BAD: directly inject user input into innerHTML
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    document.getElementById("greeting").innerHTML = "Hello " + name;
+  </script>
+</body>
+</html>
+
 ```
 
 Secure HTML5 Example (with encoding / safe API)
@@ -74,7 +91,53 @@ Secure HTML5 Example (with encoding / safe API)
 </body>
 </html>
 ```
+If a developer must write their own function, they need to cover all HTML special characters:
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Custom Encode</title>
+</head>
+<body>
+  <h2>Greeting</h2>
+  <div id="greeting"></div>
 
+  <script>
+    // GOOD: properly escape all critical characters
+    function secureEncode(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "Guest";
+
+    document.getElementById("greeting").innerHTML = "Hello " + secureEncode(name);
+  </script>
+</body>
+</html>
+```
+```
+import org.apache.commons.text.StringEscapeUtils;
+
+public class SecureServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String userInput = request.getParameter("name");
+
+        // GOOD: use a well-tested library
+        String safeInput = StringEscapeUtils.escapeHtml4(userInput);
+
+        PrintWriter out = response.getWriter();
+        out.println("<p>Hello " + safeInput + "</p>");
+    }
+}
+```
 Python (Flask with MarkupSafe / Jinja2 auto-escaping)
 ```
 from flask import Flask, request, render_template_string
@@ -95,13 +158,193 @@ Or with Jinja2 templates:
 <p>Hello {{ name }}</p>
 ```
 
-# Input Utilization
 
-### Use of Parameterized Statements
+
+### Parameterized Statements
 
 Parameterized Statements are used to prevent both SQL Injection and Command Injection vulnerabilities which are listed at the top of OWASP Top 10 Application Security Risks and MITRE Top 25 Most Dangerous Software Errors.
 
 ![alt text](image-1.png)
+
+Insecure Example — JavaScript (Node.js with mysql)
+```
+// BAD: SQL query built by string concatenation
+const mysql = require('mysql');
+const connection = mysql.createConnection({host:'localhost', user:'root', password:'', database:'test'});
+
+const username = req.query.username;  // user input from HTTP request
+const password = req.query.password;
+
+const query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
+
+connection.query(query, (err, results) => {
+  if (err) throw err;
+  console.log(results);
+});
+```
+
+Secure Example — JavaScript (Node.js with mysql2 prepared statements)
+```
+// GOOD: parameterized query (placeholders + values)
+const mysql = require('mysql2');
+const connection = mysql.createConnection({host:'localhost', user:'root', password:'', database:'test'});
+
+const username = req.query.username;
+const password = req.query.password;
+
+// Use ? placeholders, values passed separately
+const query = "SELECT * FROM users WHERE username = ? AND password = ?";
+connection.execute(query, [username, password], (err, results) => {
+  if (err) throw err;
+  console.log(results);
+});
+```
+
+Insecure Example — Node.js (Command Injection)
+```
+// BAD: concatenating user input into a shell command
+const { exec } = require('child_process');
+const http = require('http');
+const url = require('url');
+
+http.createServer((req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  const filename = queryObject.file; // user-controlled input
+
+  // Dangerous: unsanitized input in shell command
+  exec('cat ' + filename, (err, stdout, stderr) => {
+    if (err) {
+      res.end('Error: ' + stderr);
+    } else {
+      res.end(stdout);
+    }
+  });
+}).listen(3000);
+```
+Attack - http://localhost:3000/?file=notes.txt; rm -rf /
+
+Secure Example — Node.js (No Injection)
+```
+// GOOD: avoids shell by passing arguments as an array
+const { execFile } = require('child_process');
+const http = require('http');
+const url = require('url');
+const path = require('path');
+
+http.createServer((req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  let filename = queryObject.file;
+
+  // Restrict to a safe directory (whitelist)
+  const safeBase = '/var/data/files';
+  filename = path.basename(filename); // strip paths
+  const safePath = path.join(safeBase, filename);
+
+  execFile('cat', [safePath], (err, stdout, stderr) => {
+    if (err) {
+      res.end('Error: ' + stderr);
+    } else {
+      res.end(stdout);
+    }
+  });
+}).listen(3000);
+```
+
+### File Handling
+
+file handling is one of the biggest attack surfaces in web applications. If you take user input (like a filename or path) and use it directly, you risk:
+
+- Command Injection → input injected into shell command (cat, rm, etc.)
+- Directory Traversal → attacker reads /etc/passwd by using ../../
+- Remote File Inclusion (RFI) → attacker tricks your app into fetching code from another server
+
+To avoid always Restrict to a safe base directory
+
+Insecure Example (Node.js)
+```
+const fs = require('fs');
+const http = require('http');
+const url = require('url');
+
+http.createServer((req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  const filename = queryObject.file; // User input
+
+  // BAD: user input directly in filesystem path
+  fs.readFile(filename, 'utf8', (err, data) => {
+    if (err) {
+      res.end("Error reading file.");
+    } else {
+      res.end(data);
+    }
+  });
+}).listen(3000);
+```
+
+Secure Example (Node.js)
+- Restrict to a safe base directory
+
+```
+// GOOD: avoids shell by passing arguments as an array
+const { execFile } = require('child_process');
+const http = require('http');
+const url = require('url');
+const path = require('path');
+
+http.createServer((req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  let filename = queryObject.file;
+
+  // Restrict to a safe directory (whitelist)
+  const safeBase = '/var/data/files';
+  filename = path.basename(filename); // strip paths
+  const safePath = path.join(safeBase, filename);
+
+  execFile('cat', [safePath], (err, stdout, stderr) => {
+    if (err) {
+      res.end('Error: ' + stderr);
+    } else {
+      res.end(stdout);
+    }
+  });
+}).listen(3000);
+```
+Another example
+```
+const fs = require('fs');
+const http = require('http');
+const url = require('url');
+const path = require('path');
+
+http.createServer((req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  let filename = queryObject.file;
+
+  // Restrict to a safe base directory
+  const safeBase = path.resolve("user_files");
+  const requestedPath = path.join(safeBase, path.basename(filename)); // strip path traversal
+
+  // Check that the path is still inside safeBase
+  if (!requestedPath.startsWith(safeBase)) {
+    res.writeHead(400);
+    return res.end("Invalid file path.");
+  }
+
+  // Only allow specific file extensions
+  if (!/\.txt$/i.test(requestedPath)) {
+    res.writeHead(400);
+    return res.end("Invalid file type.");
+  }
+
+  fs.readFile(requestedPath, 'utf8', (err, data) => {
+    if (err) {
+      res.end("Error reading file.");
+    } else {
+      res.end(data);
+    }
+  });
+}).listen(3000);
+```
 
 # Memory Utilization
 
