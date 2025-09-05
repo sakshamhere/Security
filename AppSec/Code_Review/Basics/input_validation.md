@@ -111,6 +111,50 @@ When reading into a buffer (C, C++) or allocating memory for input (Java, C#):
 
 ![alt text](image-3.png)
 
+# Unauthorized Access
+
+### Direct object reference
+
+# Cryptographic Failures
+
+### Insecure password storage
+
+Using one-way salted hashes with multiple iterations to store passwords
+
+Why bad: no salt, single fast hash → attackers can precompute and brute force quickly.
+
+Non-secure (bad)
+```
+# BAD: unsalted, single-round hash (vulnerable to rainbow tables and fast brute force)
+import hashlib
+
+def store_password_bad(password):
+    digest = hashlib.sha256(password.encode('utf-8')).hexdigest()   # no salt, one round
+    # store digest in DB
+    return digest
+```
+
+Secure (good) — Python (PBKDF2)
+```
+# GOOD: PBKDF2 with per-user salt and many iterations; store salt, iterations, algo, and derived key
+import os, hashlib, base64
+
+def hash_password(password: str, iterations: int = 200_000) -> str:
+    salt = os.urandom(16)  # 128-bit salt
+    dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, iterations, dklen=32)
+    # store an encoding that includes algorithm, iterations, salt and derived key
+    return f"pbkdf2_sha256${iterations}${base64.b64encode(salt).decode()}${base64.b64encode(dk).decode()}"
+
+def verify_password(stored: str, candidate: str) -> bool:
+    algo, iters_s, salt_b64, dk_b64 = stored.split('$')
+    iterations = int(iters_s)
+    salt = base64.b64decode(salt_b64)
+    expected = base64.b64decode(dk_b64)
+    derived = hashlib.pbkdf2_hmac('sha256', candidate.encode(), salt, iterations, dklen=len(expected))
+    # constant-time comparison
+    return hashlib.compare_digest(derived, expected)
+```
+
 # Logging
 
 ### Safe Logging Framework
