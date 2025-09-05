@@ -91,6 +91,14 @@ Secure HTML5 Example (with encoding / safe API)
 </body>
 </html>
 ```
+HTML encoding (XSS prevention in Spring)
+```
+@GetMapping("/greet")
+@ResponseBody
+public String greet(@RequestParam String name) {
+    return "Hello " + HtmlUtils.htmlEscape(name) + "!";
+}
+```
 If a developer must write their own function, they need to cover all HTML special characters:
 ```
 <!DOCTYPE html>
@@ -181,6 +189,19 @@ connection.query(query, (err, results) => {
   if (err) throw err;
   console.log(results);
 });
+```
+Secure (JdbcTemplate)
+```
+@Autowired
+private JdbcTemplate jdbcTemplate;
+
+public User findUser(String username) {
+    return jdbcTemplate.queryForObject(
+        "SELECT * FROM users WHERE username = ?",
+        new Object[]{username},
+        (rs, rowNum) -> new User(rs.getString("username"), rs.getString("password"))
+    );
+}
 ```
 
 Secure Example — JavaScript (Node.js with mysql2 prepared statements)
@@ -365,15 +386,17 @@ Attackers often bypass simple extension checks using:
 
 
 To avoid
-- Generate safe random filename, UUID-based renaming → no user-controlled filenames.
-- Only allow specific mime types (Use Tika or magic number inspection for real MIME.)
+- Normalise filename
+- strip path to prevent directory traversal
+- UUID-based renaming → no user-controlled filenames.
+- Only allow specific mime types (for ex in java Use Tika or magic number inspection for real MIME.)
 - Double-check actual content type and reject suspicious file
 - Limit file size
 - Reject if extension not in whitelist
 - Convert extension to lowercase (blocks .JPG.php tricks).
-- scan for malicious content
+- save file temprorily and scan for malicious content
 - Store outside webroot → prevents direct execution.
--  strip path to prevent directory traversal
+
 
 Insecure Example (No Content Check)
 ```
@@ -1051,7 +1074,22 @@ def store_password_bad(password):
     # store digest in DB
     return digest
 ```
+Secure (Spring Security with BCrypt)
+```
+@Bean
+public PasswordEncoder passwordEncoder() {
+    // BCrypt is salted and has configurable cost (iterations)
+    return new BCryptPasswordEncoder(12);
+}
 
+@Autowired
+private PasswordEncoder passwordEncoder;
+
+public void saveUser(String username, String plainPassword) {
+    String hashed = passwordEncoder.encode(plainPassword);
+    // store "hashed" in DB
+}
+```
 Secure (good) — Python (PBKDF2)
 ```
 # GOOD: PBKDF2 with per-user salt and many iterations; store salt, iterations, algo, and derived key
@@ -1087,6 +1125,39 @@ with open('/etc/myapp/secret_key.txt', 'rb') as f:
     key = f.read()
 
 # Use key directly — no access controls, no auditing
+```
+Secure (AES-GCM, key from KMS stub)
+```
+import javax.crypto.*;
+import javax.crypto.spec.*;
+
+@Service
+public class EncryptionService {
+
+    private final SecretKey key; // In real app, load from AWS KMS / Vault
+
+    public EncryptionService(KeyService keyService) {
+        this.key = keyService.getKey();
+    }
+
+    public byte[] encrypt(byte[] data) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        byte[] iv = new byte[12];
+        new SecureRandom().nextBytes(iv);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+        byte[] encrypted = cipher.doFinal(data);
+        return ByteBuffer.allocate(iv.length + encrypted.length).put(iv).put(encrypted).array();
+    }
+}
+```
+```
+@Service
+public class KeyService {
+    public SecretKey getKey() {
+        // In production, fetch from AWS KMS, Azure Key Vault, or HashiCorp Vault
+        return Keys.secretKeyFor(SignatureAlgorithm.HS256); // placeholder
+    }
+}
 ```
 
 Why good: data key is generated server-side by KMS and the encrypted data key (ciphertext) is stored alongside the ciphertext. KMS controls access, provides audit logs, key rotation, and you never store raw long-term keys yourself.
