@@ -309,7 +309,7 @@ http.createServer((req, res) => {
   });
 }).listen(3000);
 ```
-Another example
+Another secure example
 ```
 const fs = require('fs');
 const http = require('http');
@@ -344,6 +344,624 @@ http.createServer((req, res) => {
     }
   });
 }).listen(3000);
+```
+
+### File Upload
+
+If file uploads are not handled securely, attackers can perform:
+
+- Arbitrary File Upload → upload a webshell (.jsp, .php, .js) and execute code.
+- Directory Traversal → save file outside intended folder (../../etc/passwd).
+- Malicious File Type Upload → upload malware disguised as an image.
+- Command Injection → if uploaded file names are passed to shell commands.
+
+Attackers often bypass simple extension checks using:
+
+- Double extensions → evil.php.jpg
+- Uppercase/mixed case → evil.PHP
+- Hidden Unicode characters → evil.php%20 or evil.pℎp (homoglyph)
+- Null byte injection → evil.php\0.jpg (in old parsers)
+- MIME type mismatch → real PHP file but Content-Type: image/jpeg
+
+
+To avoid
+- Generate safe random filename, UUID-based renaming → no user-controlled filenames.
+- Only allow specific mime types (Use Tika or magic number inspection for real MIME.)
+- Double-check actual content type and reject suspicious file
+- Limit file size
+- Reject if extension not in whitelist
+- Convert extension to lowercase (blocks .JPG.php tricks).
+- scan for malicious content
+- Store outside webroot → prevents direct execution.
+-  strip path to prevent directory traversal
+
+Insecure Example (No Content Check)
+```
+// BAD: only checks extension, doesn’t check file contents
+const express = require('express');
+const multer = require('multer');
+const app = express();
+
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send(`File uploaded: ${req.file.originalname}`);
+});
+
+app.listen(3000);
+```
+Insecure Example (Java Servlet)
+```
+@WebServlet("/upload")
+public class InsecureUploadServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
+        try {
+            List<FileItem> items = upload.parseRequest(request);
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+                    // BAD: trust user-supplied filename
+                    String fileName = item.getName();
+
+                    // BAD: save directly under webroot
+                    File uploadedFile = new File(getServletContext().getRealPath("/") + fileName);
+                    item.write(uploadedFile);
+
+                    response.getWriter().println("Uploaded: " + fileName);
+                }
+            }
+        } catch (Exception e) {
+            throw new ServletException("Upload failed", e);
+        }
+    }
+}
+```
+Secure Spring Boot Example
+```
+import org.apache.tika.Tika;
+import org.springframework.core.io.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/files")
+public class SecureFileController {
+
+    private static final Path UPLOAD_DIR = Paths.get("/var/app/uploads"); // outside webroot
+    private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    private static final Set<String> ALLOWED_EXTENSIONS =
+            Set.of(".jpg", ".jpeg", ".png", ".gif", ".pdf");
+    private static final Set<String> ALLOWED_MIME =
+            Set.of("image/jpeg", "image/png", "image/gif", "application/pdf");
+
+    private final Tika tika = new Tika();
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Empty file.");
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            return ResponseEntity.badRequest().body("File too large.");
+        }
+
+        // Normalize and validate extension
+        String originalName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        String ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            return ResponseEntity.badRequest().body("Invalid file type.");
+        }
+
+        // Safe random filename
+        String safeName = UUID.randomUUID().toString() + ext;
+        Path targetPath = UPLOAD_DIR.resolve(safeName).normalize();
+
+        // Save file temporarily
+        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Validate MIME type with Apache Tika
+        String detectedType = tika.detect(targetPath);
+        if (!ALLOWED_MIME.contains(detectedType)) {
+            Files.deleteIfExists(targetPath);
+            return ResponseEntity.badRequest().body("Invalid content.");
+        }
+
+        // Optionally: run AV scan (ClamAV / commercial scanner)
+        // e.g. call external process or API before final acceptance
+
+        return ResponseEntity.ok("Uploaded securely as: " + safeName);
+    }
+
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> download(@PathVariable String filename) throws IOException {
+        // Normalize to prevent directory traversal
+        String safeName = Paths.get(filename).getFileName().toString();
+        Path filePath = UPLOAD_DIR.resolve(safeName).normalize();
+
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Extension check again (defense in depth)
+        String ext = safeName.substring(safeName.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String mimeType = Files.probeContentType(filePath);
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+
+        Resource resource = new UrlResource(filePath.toUri());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + safeName + "\"")
+                .body(resource);
+    }
+}
+```
+Secure Example (Java Servlet with Checks)
+```
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.annotation.*;
+import javax.servlet.http.*;
+
+import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.*;
+import org.apache.commons.fileupload.servlet.*;
+import org.apache.tika.Tika;
+
+@WebServlet("/upload")
+@MultipartConfig
+public class SecureUploadServlet extends HttpServlet {
+    private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+    private static final String UPLOAD_DIR = "/var/app/uploads"; // outside webroot
+    private static final Set<String> ALLOWED_EXTENSIONS =
+            Set.of(".jpg", ".jpeg", ".png", ".gif", ".pdf");
+    private static final Set<String> ALLOWED_MIME =
+            Set.of("image/jpeg", "image/png", "image/gif", "application/pdf");
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setFileSizeMax(MAX_FILE_SIZE);
+
+        Tika tika = new Tika(); // for MIME detection
+
+        try {
+            List<FileItem> items = upload.parseRequest(request);
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+                    // Normalize filename (strip paths)
+                    String originalName = Paths.get(item.getName()).getFileName().toString();
+                    String ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+
+                    // Validate extension
+                    if (!ALLOWED_EXTENSIONS.contains(ext)) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file type.");
+                        continue;
+                    }
+
+                    // Generate safe random filename
+                    String safeName = UUID.randomUUID().toString() + ext;
+                    File uploadedFile = new File(UPLOAD_DIR, safeName);
+
+                    // Save temporarily
+                    item.write(uploadedFile);
+
+                    // Validate MIME type with Apache Tika (content-based)
+                    String detectedType = tika.detect(uploadedFile);
+                    if (!ALLOWED_MIME.contains(detectedType)) {
+                        uploadedFile.delete();
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid content.");
+                        continue;
+                    }
+
+                    // Run antivirus scan (ClamAV example)
+                    Process scan = new ProcessBuilder("clamscan", uploadedFile.getAbsolutePath()).start();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(scan.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            if (line.contains("FOUND")) {
+                                uploadedFile.delete();
+                                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malicious file detected.");
+                                return;
+                            }
+                        }
+                    }
+
+                    response.getWriter().println("File securely uploaded as: " + safeName);
+                }
+            }
+        } catch (FileUploadBase.SizeLimitExceededException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File too large.");
+        } catch (Exception e) {
+            throw new ServletException("Upload failed", e);
+        }
+    }
+}
+```
+
+Secure Example (Node.js + Express)
+```
+const express = require('express');
+const multer  = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const app = express();
+
+// Restrict storage location
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/'); // dedicated safe folder
+    },
+    filename: function (req, file, cb) {
+      // Generate safe random filename, keep extension
+      const safeName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, safeName + path.extname(file.originalname).toLowerCase());
+    }
+  }),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+  fileFilter: function (req, file, cb) {
+    // Only allow specific mime types
+    const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.txt', '.pdf'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!allowed.includes(ext)) {
+      return cb(new Error('Invalid file type'), false);
+    }
+    cb(null, true);
+  }
+});
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send(`File securely uploaded as ${req.file.filename}`);
+});
+
+app.listen(3000);
+```
+Secure Example (with Content Scanning)
+```
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const { exec } = require('child_process');
+
+const app = express();
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+      const safeName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, safeName + path.extname(file.originalname).toLowerCase());
+    }
+  }),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB max
+  fileFilter: function (req, file, cb) {
+    const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.txt', '.pdf'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!allowed.includes(ext)) {
+      return cb(new Error('Invalid file type'), false);
+    }
+    cb(null, true);
+  }
+});
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  const filePath = req.file.path;
+
+  // Run antivirus scan (ClamAV example)
+  exec(`clamscan ${filePath}`, (err, stdout, stderr) => {
+    if (err) {
+      // If scan fails or detects virus
+      fs.unlinkSync(filePath); // delete the file
+      return res.status(400).send("File rejected: malicious content detected.");
+    }
+
+    if (stdout.includes("Infected files: 1")) {
+      fs.unlinkSync(filePath); // delete the file
+      return res.status(400).send("File rejected: virus detected.");
+    }
+
+    // If clean
+    res.send(`File securely uploaded as ${req.file.filename}`);
+  });
+});
+
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+```
+Secure Example (Node.js — robust checks)
+```
+const express = require('express');
+const multer  = require('multer');
+const path = require('path');
+const fs = require('fs');
+const FileType = require('file-type'); // npm install file-type
+
+const app = express();
+
+// Storage settings
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => {
+    // Always rename file to safe random name
+    const safeName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, safeName + path.extname(file.originalname).toLowerCase());
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+  fileFilter: (req, file, cb) => {
+    const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    // Reject if extension not in whitelist
+    if (!allowedExt.includes(ext)) {
+      return cb(new Error('Invalid extension'), false);
+    }
+
+    cb(null, true);
+  }
+});
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    // Double-check actual content type (magic number)
+    const filePath = req.file.path;
+    const fileType = await FileType.fromFile(filePath);
+
+    const allowedMime = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+    if (!fileType || !allowedMime.includes(fileType.mime)) {
+      fs.unlinkSync(filePath); // delete suspicious file
+      return res.status(400).send("Malicious file detected and removed.");
+    }
+
+    res.send(`File securely uploaded as ${req.file.filename}`);
+  } catch (err) {
+    return res.status(500).send("Upload error");
+  }
+});
+
+app.listen(3000, () => console.log("Server running at http://localhost:3000"));
+```
+
+### File Download
+
+Uploading safely is only half the story. You also need to serve/download uploaded files securely
+
+To Prevent
+- Normalize filename → Paths.get(...).getFileName() removes ../ traversal
+- Check extension whitelist, Extension whitelist → only serve .jpg, .png, .pdf, etc.
+- Detect MIME type safely
+- Force download → `Content-Disposition: attachment` prevents inline execution
+- Serve outside webroot → prevents RFI
+
+What Content-Disposition does - Normally, if you serve a file like an .html or .js file, the browser might render or execute it (e.g., HTML is displayed, JavaScript is run). If you want to prevent that (for security reasons, like avoiding cross-site scripting (XSS)), you can tell the browser: "Don’t try to display this file—treat it as a downloadable attachment.".
+
+Using Content-Disposition: attachment ensures that potentially dangerous files (HTML, JS, SVG, etc.) are downloaded safely instead of executed in the browser
+
+Insecure Example — Direct File Access
+```
+@WebServlet("/download")
+public class InsecureDownloadServlet extends HttpServlet {
+    private static final String UPLOAD_DIR = "/var/app/uploads";
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String filename = request.getParameter("file");
+
+        // BAD: directly concatenate user input into path
+        File file = new File(UPLOAD_DIR, filename);
+
+        if (!file.exists()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        // BAD: browser may execute malicious content (e.g., .jsp, .html)
+        Files.copy(file.toPath(), response.getOutputStream());
+    }
+}
+```
+Insecure Spring Boot Example
+```
+@RestController
+@RequestMapping("/files")
+public class InsecureFileController {
+
+    private static final String UPLOAD_DIR = "uploads/";
+
+    @PostMapping("/upload")
+    public String upload(@RequestParam("file") MultipartFile file) throws IOException {
+        // BAD: trust user filename, no validation
+        Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        return "Uploaded: " + file.getOriginalFilename();
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<Resource> download(@RequestParam("file") String filename) throws IOException {
+        // BAD: no normalization, vulnerable to ../ traversal
+        Path path = Paths.get(UPLOAD_DIR, filename);
+        Resource resource = new UrlResource(path.toUri());
+        return ResponseEntity.ok().body(resource);
+    }
+}
+```
+Secure Example — Safe File Download Servlet
+```
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.annotation.*;
+import javax.servlet.http.*;
+
+@WebServlet("/download")
+public class SecureDownloadServlet extends HttpServlet {
+    private static final String UPLOAD_DIR = "/var/app/uploads";
+    private static final Set<String> ALLOWED_EXTENSIONS =
+            Set.of(".jpg", ".jpeg", ".png", ".gif", ".pdf");
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String filename = request.getParameter("file");
+        if (filename == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File parameter missing.");
+            return;
+        }
+
+        // Normalize filename to prevent traversal
+        String safeName = Paths.get(filename).getFileName().toString();
+        File file = new File(UPLOAD_DIR, safeName);
+
+        if (!file.exists()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        // Check extension whitelist
+        String ext = safeName.substring(safeName.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid file type.");
+            return;
+        }
+
+        // Detect MIME type safely
+        String mimeType = Files.probeContentType(file.toPath());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream"; // fallback
+        }
+
+        // Force download (prevent execution in browser)
+        response.setContentType(mimeType);
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + safeName + "\"");
+        response.setContentLengthLong(file.length());
+
+        try (InputStream in = new FileInputStream(file);
+             OutputStream out = response.getOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+}
+```
+Secure Spring Boot Example
+```
+import org.apache.tika.Tika;
+import org.springframework.core.io.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/files")
+public class SecureFileController {
+
+    private static final Path UPLOAD_DIR = Paths.get("/var/app/uploads"); // outside webroot
+    private static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    private static final Set<String> ALLOWED_EXTENSIONS =
+            Set.of(".jpg", ".jpeg", ".png", ".gif", ".pdf");
+    private static final Set<String> ALLOWED_MIME =
+            Set.of("image/jpeg", "image/png", "image/gif", "application/pdf");
+
+    private final Tika tika = new Tika();
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Empty file.");
+        }
+
+        if (file.getSize() > MAX_FILE_SIZE) {
+            return ResponseEntity.badRequest().body("File too large.");
+        }
+
+        // Normalize and validate extension
+        String originalName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        String ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            return ResponseEntity.badRequest().body("Invalid file type.");
+        }
+
+        // Safe random filename
+        String safeName = UUID.randomUUID().toString() + ext;
+        Path targetPath = UPLOAD_DIR.resolve(safeName).normalize();
+
+        // Save file temporarily
+        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Validate MIME type with Apache Tika
+        String detectedType = tika.detect(targetPath);
+        if (!ALLOWED_MIME.contains(detectedType)) {
+            Files.deleteIfExists(targetPath);
+            return ResponseEntity.badRequest().body("Invalid content.");
+        }
+
+        // Optionally: run AV scan (ClamAV / commercial scanner)
+        // e.g. call external process or API before final acceptance
+
+        return ResponseEntity.ok("Uploaded securely as: " + safeName);
+    }
+
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> download(@PathVariable String filename) throws IOException {
+        // Normalize to prevent directory traversal
+        String safeName = Paths.get(filename).getFileName().toString();
+        Path filePath = UPLOAD_DIR.resolve(safeName).normalize();
+
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Extension check again (defense in depth)
+        String ext = safeName.substring(safeName.lastIndexOf(".")).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String mimeType = Files.probeContentType(filePath);
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+
+        Resource resource = new UrlResource(filePath.toUri());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + safeName + "\"")
+                .body(resource);
+    }
+}
 ```
 
 # Memory Utilization
